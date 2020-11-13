@@ -1,26 +1,18 @@
 package model;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Class that describes user results which will be described in statement.
+ *
  * @author Vladislav Prokopenko.
  */
-@Component
 public class UserFinalStatementResult {
-    /**
-     * ID of statement;
-     */
+
     private int id;
 
-    /**
-     * Full username;
-     */
+
     private String fullname;
 
-    /**
-     * Identification number of user;
-     */
+
     private long idn;
 
     /**
@@ -28,15 +20,13 @@ public class UserFinalStatementResult {
      */
     private int totalExamResult;
 
-    /**
-     * User certificate point;
-     */
+
     private int certificatePoint;
 
     /**
      * Is admission approved;
      */
-    private boolean is_approved;
+    private boolean isApproved;
 
     /**
      * Total result. Sum of totalExamResult and certificate point;
@@ -46,10 +36,11 @@ public class UserFinalStatementResult {
 
     /**
      * Get total result
+     *
      * @return Sum of totalExamResult and certificate point
      */
     public int getTotalResult() {
-        this.totalResult = totalExamResult+ certificatePoint;
+        this.totalResult = totalExamResult + certificatePoint;
         return this.totalResult;
     }
 
@@ -93,12 +84,12 @@ public class UserFinalStatementResult {
         this.certificatePoint = certificatePoint;
     }
 
-    public boolean isIs_approved() {
-        return is_approved;
+    public boolean isApproved() {
+        return isApproved;
     }
 
-    public void setIs_approved(boolean is_approved) {
-        this.is_approved = is_approved;
+    public void setApproved(boolean approved) {
+        this.isApproved = approved;
     }
 
 

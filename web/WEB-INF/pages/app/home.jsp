@@ -11,7 +11,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page isELIgnored="false" %>
-<fmt:setLocale value="${sessionScope.get(\"language\")}" />
+<fmt:setLocale value="${sessionScope.get(\"language\")}"/>
 <fmt:setBundle basename="resource"/>
 <html>
 <head>
@@ -22,16 +22,14 @@
 <%@include file="jspf/navbar.jspf" %>
 
 
-
-
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="display-4"><fmt:message key="home.welcome" /></h1>
-        <p class="lead"><fmt:message key="home.welcome.text" /></p>
+        <h1 class="display-4"><fmt:message key="home.welcome"/></h1>
+        <p class="lead"><fmt:message key="home.welcome.text"/></p>
     </div>
 </div>
 
-<%@include file="changeLanguage.jsp" %>
+<%@include file="../changeLanguage.jsp" %>
 
 
 </body>

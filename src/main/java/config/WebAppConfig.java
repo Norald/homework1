@@ -12,21 +12,19 @@ import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan({"controller","model","db"})
+@ComponentScan({"controller", "model", "db", "pdf","service"})
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
-    // Позволяет видеть все ресурсы в папке pages, такие как картинки, стили и т.п.
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("WEB-INF/pages/**").addResourceLocations("WEB-INF/pages/**");
+        registry.addResourceHandler("/WEB-INF/pages/**").addResourceLocations("/WEB-INF/pages/");
     }
 
-    // а этот бин инициализирует View нашего проекта
-    // точно это же мы делали в mvc-dispatcher-servlet.xml
+
     @Bean
     public InternalResourceViewResolver setupViewResolver() {
         InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("WEB-INF/pages/");
+        resolver.setPrefix("/WEB-INF/pages/");
         resolver.setSuffix(".jsp");
         resolver.setViewClass(JstlView.class);
 

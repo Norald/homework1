@@ -33,11 +33,11 @@ public class DBFields {
     public static final String FACULTY__DESCRIPTION_UA = "description_ua";
     public static final String FACULTY_BUDGET__AMOUNT = "budget_amount";
     public static final String FACULTY_TOTAL__AMOUNT = "total_amount";
-    public static final String FACULTY_LOGO__URL = "logo_url" ;
+    public static final String FACULTY_LOGO__URL = "logo_url";
 
     public static final String SUBJECT__NAME = "name";
     public static final String SUBJECT__NAME_UA = "name_ua";
-    public static final String SUBJECT__DESCRIPTION= "description";
+    public static final String SUBJECT__DESCRIPTION = "description";
     public static final String SUBJECT__DESCRIPTION_UA = "description_ua";
 
     public static final String SUBJECT__EXAM_ID = "subject_exam_id";

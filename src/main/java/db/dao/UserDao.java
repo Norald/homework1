@@ -4,7 +4,6 @@ import db.DBManager;
 import model.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +13,7 @@ import java.util.*;
 
 /**
  * Data access object for user entities.
+ *
  * @author Vladislav Prokopenko
  */
 @Repository
@@ -26,8 +26,9 @@ public class UserDao {
 
     /**
      * Adding user
-     * @param email user email
-     * @param idn user identification number
+     *
+     * @param email    user email
+     * @param idn      user identification number
      * @param password user password
      */
     public void addUser(String email, long idn, String password) {
@@ -44,7 +45,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -52,20 +53,21 @@ public class UserDao {
 
     /**
      * Add user details
-     * @param userId user id
-     * @param name user name
-     * @param surname user surname
-     * @param patronymic user patronymic
-     * @param city user cirt
-     * @param region user region
-     * @param school_name user school name
+     *
+     * @param userId            user id
+     * @param name              user name
+     * @param surname           user surname
+     * @param patronymic        user patronymic
+     * @param city              user cirt
+     * @param region            user region
+     * @param school_name       user school name
      * @param certificate_point user average certificate point
-     * @param name_ua user name ukrainian
-     * @param surname_ua user surname ukrainian
-     * @param patronymic_ua user patronymic ukrainian
-     * @param city_ua user city ukrainian
-     * @param region_ua user region ukrainian
-     * @param school_name_ua user school name ukrainian
+     * @param name_ua           user name ukrainian
+     * @param surname_ua        user surname ukrainian
+     * @param patronymic_ua     user patronymic ukrainian
+     * @param city_ua           user city ukrainian
+     * @param region_ua         user region ukrainian
+     * @param school_name_ua    user school name ukrainian
      */
     public void addUserDetails(int userId, String name, String surname, String patronymic, String city, String region, String school_name, int certificate_point, String name_ua, String surname_ua, String patronymic_ua, String city_ua, String region_ua, String school_name_ua) {
         PreparedStatement pstmt = null;
@@ -91,7 +93,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -99,7 +101,8 @@ public class UserDao {
 
     /**
      * Get user details
-     * @param user user
+     *
+     * @param user   user
      * @param locale locale
      * @return user details
      */
@@ -112,21 +115,21 @@ public class UserDao {
         String city;
         String region;
         String school_name;
-        if(locale.equals("en")){
+        if (locale.equals("en")) {
             request = DaoUserRequest.GET_USER_DETAILS_BY_ID;
-            name=DBFields.USER__NAME;
-            surname=DBFields.USER__SURNAME;
+            name = DBFields.USER__NAME;
+            surname = DBFields.USER__SURNAME;
             patronymic = DBFields.USER__PATRONYMIC;
             city = DBFields.USER__CITY;
-            region=DBFields.USER__REGION;
+            region = DBFields.USER__REGION;
             school_name = DBFields.USER__SCHOOL_NAME;
-        }else{
+        } else {
             request = DaoUserRequest.GET_USER_DETAILS_BY_ID_UA;
-            name=DBFields.USER__NAME_UA;
-            surname=DBFields.USER__SURNAME_UA;
+            name = DBFields.USER__NAME_UA;
+            surname = DBFields.USER__SURNAME_UA;
             patronymic = DBFields.USER__PATRONYMIC_UA;
             city = DBFields.USER__CITY_UA;
-            region=DBFields.USER__REGION_UA;
+            region = DBFields.USER__REGION_UA;
             school_name = DBFields.USER__SCHOOL_NAME_UA;
         }
 
@@ -142,19 +145,19 @@ public class UserDao {
             rs = pstmt.executeQuery();
             if (rs.next())
                 details = new UserDetails();
-                details.setUserId(rs.getInt(DBFields.USER__ID));
-                details.setName(rs.getString(name));
-                details.setSurname(rs.getString(surname));
-                details.setPatronymic(rs.getString(patronymic));
-                details.setCity(rs.getString(city));
-                details.setRegion(rs.getString(region));
-                details.setSchool_name(rs.getString(school_name));
-                details.setAverage_certificate(rs.getInt(DBFields.USER__AVERAGE_CERTIFICATE_POINT));
+            details.setUserId(rs.getInt(DBFields.USER__ID));
+            details.setName(rs.getString(name));
+            details.setSurname(rs.getString(surname));
+            details.setPatronymic(rs.getString(patronymic));
+            details.setCity(rs.getString(city));
+            details.setRegion(rs.getString(region));
+            details.setSchoolName(rs.getString(school_name));
+            details.setAverage_certificate(rs.getInt(DBFields.USER__AVERAGE_CERTIFICATE_POINT));
             rs.close();
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -164,23 +167,24 @@ public class UserDao {
 
     /**
      * Get Map of user admissions
-     * @param user user
+     *
+     * @param user   user
      * @param locale locale
      * @return Map of user admissions
      */
-    public Map<String, Date> findUserAdmissions(User user, String locale){
-        String fieldName="";
-        String request= "";
-        if(locale.equals("en")){
+    public Map<String, Date> findUserAdmissions(User user, String locale) {
+        String fieldName = "";
+        String request = "";
+        if (locale.equals("en")) {
             request = DaoUserRequest.GET_ALL_USER_ADMISSION;
-            fieldName=DBFields.FACULTY__NAME;
-        }else{
+            fieldName = DBFields.FACULTY__NAME;
+        } else {
             request = DaoUserRequest.GET_ALL_USER_ADMISSION_UA;
-            fieldName=DBFields.FACULTY__NAME_UA;
+            fieldName = DBFields.FACULTY__NAME_UA;
 
         }
 
-        Map<String, Date> mapAdmissionList = new HashMap< String, Date>();
+        Map<String, Date> mapAdmissionList = new HashMap<String, Date>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Connection con = null;
@@ -198,7 +202,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -232,6 +236,7 @@ public class UserDao {
 
     /**
      * Find user by email
+     *
      * @param email user email
      * @return user
      */
@@ -252,7 +257,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -261,6 +266,7 @@ public class UserDao {
 
     /**
      * Find user by identification number
+     *
      * @param idn identification number
      * @return user
      */
@@ -281,7 +287,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -292,6 +298,7 @@ public class UserDao {
     /**
      * Find user by email and password.
      * Method need for authorisation.
+     *
      * @param email
      * @param password
      * @return user
@@ -315,9 +322,9 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
-            if(con!=null) {
+            if (con != null) {
                 DBManager.getInstance().commitAndClose(con);
             }
         }
@@ -327,10 +334,11 @@ public class UserDao {
 
     /**
      * Get Set of user subjects by email
+     *
      * @param email user email
      * @return Set of user subjects
      */
-    public Set<Integer> getUserSubjects(String email){
+    public Set<Integer> getUserSubjects(String email) {
         Set<Integer> userSubjects = new TreeSet<Integer>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -348,7 +356,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -358,7 +366,8 @@ public class UserDao {
 
     /**
      * Get all user results by email
-     * @param email user email
+     *
+     * @param email  user email
      * @param locale locale
      * @return list of all user results
      */
@@ -383,7 +392,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -392,22 +401,23 @@ public class UserDao {
 
     /**
      * Find subject exam by id
-     * @param id subject id
+     *
+     * @param id     subject id
      * @param locale locale
      * @return subject exam
      */
     public SubjectExam findSubjectExam(int id, String locale) {
-        String fieldDescription="";
-        String fieldName="";
-        String request= "";
-        if(locale.equals("en")){
+        String fieldDescription = "";
+        String fieldName = "";
+        String request = "";
+        if (locale.equals("en")) {
             request = DaoUserRequest.GET_SUBJECT_EXAM_BY_ID;
-            fieldName=DBFields.SUBJECT__NAME;
-            fieldDescription=DBFields.SUBJECT__DESCRIPTION;
-        }else{
+            fieldName = DBFields.SUBJECT__NAME;
+            fieldDescription = DBFields.SUBJECT__DESCRIPTION;
+        } else {
             request = DaoUserRequest.GET_SUBJECT_EXAM_BY_ID;
-            fieldName=DBFields.SUBJECT__NAME_UA;
-            fieldDescription=DBFields.SUBJECT__DESCRIPTION_UA;
+            fieldName = DBFields.SUBJECT__NAME_UA;
+            fieldDescription = DBFields.SUBJECT__DESCRIPTION_UA;
         }
         SubjectExam subjectExam = null;
         PreparedStatement pstmt = null;
@@ -421,14 +431,14 @@ public class UserDao {
             rs = pstmt.executeQuery();
             if (rs.next())
                 subjectExam = new SubjectExam();
-                subjectExam.setId(rs.getInt(DBFields.ENTITY__ID));
-                subjectExam.setName(rs.getString(fieldName));
-                subjectExam.setDescription(rs.getString(fieldDescription));
+            subjectExam.setId(rs.getInt(DBFields.ENTITY__ID));
+            subjectExam.setName(rs.getString(fieldName));
+            subjectExam.setDescription(rs.getString(fieldDescription));
             rs.close();
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -438,9 +448,10 @@ public class UserDao {
 
     /**
      * Add user mark
-     * @param userId user id
+     *
+     * @param userId        user id
      * @param idSubjectExam exam id
-     * @param result user result
+     * @param result        user result
      */
     public void addUserMark(int userId, int idSubjectExam, int result) {
         PreparedStatement pstmt = null;
@@ -456,7 +467,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -465,7 +476,8 @@ public class UserDao {
 
     /**
      * Add user admission to faculty
-     * @param userId user id
+     *
+     * @param userId     user id
      * @param faculty_id faculty id
      */
     public void addUserAdmissionToFaculty(int userId, int faculty_id) {
@@ -482,7 +494,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -490,11 +502,12 @@ public class UserDao {
 
     /**
      * Get user admission for faculty
-     * @param user_id user id
+     *
+     * @param user_id    user id
      * @param faculty_id faculty id
      * @return list of admissions
      */
-    public List<Admission> getUserAdmissionForFaculty(int user_id, int faculty_id){
+    public List<Admission> getUserAdmissionForFaculty(int user_id, int faculty_id) {
         List<Admission> userAdmission = new ArrayList<>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -507,14 +520,14 @@ public class UserDao {
             pstmt.setInt(2, faculty_id);
             rs = pstmt.executeQuery();
             while (rs.next()) {
-               Admission admission = admissionMapper.mapRow(rs);
-               userAdmission.add(admission);
+                Admission admission = admissionMapper.mapRow(rs);
+                userAdmission.add(admission);
             }
             rs.close();
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -523,7 +536,8 @@ public class UserDao {
 
     /**
      * Delete user results
-     * @param userId user id
+     *
+     * @param userId        user id
      * @param idSubjectExam exam id
      */
     public void removeUserResults(int userId, int idSubjectExam) {
@@ -538,7 +552,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -546,6 +560,7 @@ public class UserDao {
 
     /**
      * Delete all user admissions
+     *
      * @param userId user id
      */
     public void removeUserAdmissions(int userId) {
@@ -559,7 +574,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -568,10 +583,11 @@ public class UserDao {
 
     /**
      * Update user.
-     * @param email user email
-     * @param idn user idn.
+     *
+     * @param email    user email
+     * @param idn      user idn.
      * @param password user password.
-     * @param idUser user id.
+     * @param idUser   user id.
      */
     public void updateUser(String email, long idn, String password, int idUser) {
         PreparedStatement pstmt = null;
@@ -588,7 +604,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -596,20 +612,21 @@ public class UserDao {
 
     /**
      * Update user details.
-     * @param name user name
-     * @param surname user surname
-     * @param patronymic user patronymic
-     * @param city user city
-     * @param region user region
-     * @param school_name user school name
+     *
+     * @param name                      user name
+     * @param surname                   user surname
+     * @param patronymic                user patronymic
+     * @param city                      user city
+     * @param region                    user region
+     * @param school_name               user school name
      * @param average_certificate_point user average certificate point
-     * @param name_ua user name ukrainian
-     * @param surname_ua user surname ukrainian
-     * @param patronymic_ua user patronymic ukrainian
-     * @param city_ua user city ukrainian
-     * @param region_ua user region ukrainian
-     * @param school_name_ua user school name ukrainian
-     * @param idUser user id
+     * @param name_ua                   user name ukrainian
+     * @param surname_ua                user surname ukrainian
+     * @param patronymic_ua             user patronymic ukrainian
+     * @param city_ua                   user city ukrainian
+     * @param region_ua                 user region ukrainian
+     * @param school_name_ua            user school name ukrainian
+     * @param idUser                    user id
      */
     public void updateDetails(String name, String surname, String patronymic, String city, String region, String school_name, int average_certificate_point, String name_ua, String surname_ua, String patronymic_ua, String city_ua, String region_ua, String school_name_ua, int idUser) {
         PreparedStatement pstmt = null;
@@ -637,7 +654,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -645,19 +662,20 @@ public class UserDao {
 
     /**
      * Delete user admission for faculty
-     * @param userId user id
+     *
+     * @param userId       user id
      * @param faculty_name faculty name
-     * @param locale locale
+     * @param locale       locale
      */
     public void deleteUserAdmission(int userId, String faculty_name, String locale) {
-        String fieldName="";
-        String request= "";
-        if(locale.equals("en")){
+        String fieldName = "";
+        String request = "";
+        if (locale.equals("en")) {
             request = DaoUserRequest.DELETE_USER_ADMISSION;
-            fieldName=DBFields.FACULTY__NAME;
-        }else{
+            fieldName = DBFields.FACULTY__NAME;
+        } else {
             request = DaoUserRequest.DELETE_USER_ADMISSION_UA;
-            fieldName=DBFields.FACULTY__NAME_UA;
+            fieldName = DBFields.FACULTY__NAME_UA;
         }
 
         PreparedStatement pstmt = null;
@@ -671,7 +689,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -679,7 +697,8 @@ public class UserDao {
 
     /**
      * Get all user with limit
-     * @param startValue start value of search
+     *
+     * @param startValue   start value of search
      * @param amountOnPage amount per request
      * @return List of users
      */
@@ -696,14 +715,14 @@ public class UserDao {
             pstmt.setInt(2, amountOnPage);
             rs = pstmt.executeQuery();
             while (rs.next()) {
-                User user=mapper.mapRow(rs);
+                User user = mapper.mapRow(rs);
                 userList.add(user);
             }
             rs.close();
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -713,10 +732,11 @@ public class UserDao {
 
     /**
      * Get total count of users
+     *
      * @return count of users
      */
-    public int getTotalCountOfUsers(){
-        int result=0;
+    public int getTotalCountOfUsers() {
+        int result = 0;
         Statement stmt = null;
         ResultSet rs = null;
         Connection con = null;
@@ -731,7 +751,7 @@ public class UserDao {
             stmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -741,6 +761,7 @@ public class UserDao {
 
     /**
      * Block user by id
+     *
      * @param userId user id
      */
     public void blockUserById(int userId) {
@@ -754,7 +775,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -762,6 +783,7 @@ public class UserDao {
 
     /**
      * Unblock user by id
+     *
      * @param userId user id
      */
     public void unblockUserById(int userId) {
@@ -775,7 +797,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -784,6 +806,7 @@ public class UserDao {
 
     /**
      * Make user admin
+     *
      * @param userId user id
      */
     public void makeUserAdmin(int userId) {
@@ -797,7 +820,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -805,6 +828,7 @@ public class UserDao {
 
     /**
      * Set to admin user role
+     *
      * @param userId user id
      */
     public void makeAdminUser(int userId) {
@@ -818,7 +842,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -826,6 +850,7 @@ public class UserDao {
 
     /**
      * Delete all results by exam
+     *
      * @param subjectExamId exam id
      */
     public void deleteAllResultsBySubjectExamId(int subjectExamId) {
@@ -839,7 +864,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -847,11 +872,12 @@ public class UserDao {
 
     /**
      * Get all users admissions for faculty with date.
+     *
      * @param faculty_id faculty id
-     * @param date date
+     * @param date       date
      * @return List of admissions
      */
-    public List<Admission> getAllUsersAdmissionsForFacultyWithDate(int faculty_id, Date date){
+    public List<Admission> getAllUsersAdmissionsForFacultyWithDate(int faculty_id, Date date) {
         List<Admission> userAdmission = new ArrayList<>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -862,7 +888,7 @@ public class UserDao {
             pstmt = con.prepareStatement(DaoUserRequest.SELECT_ALL_USERS_ADMISSIONS_FOR_FACULTY);
             pstmt.setInt(1, faculty_id);
 
-            pstmt.setDate(2,date);
+            pstmt.setDate(2, date);
 
             rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -873,7 +899,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -882,11 +908,12 @@ public class UserDao {
 
     /**
      * Get all applied users admissions for faculty with date.
+     *
      * @param faculty_id faculty id
-     * @param date date
+     * @param date       date
      * @return List of admissions
      */
-    public List<Admission> getAllAppliedUsersAdmissionsForFacultyWithDate(int faculty_id, Date date){
+    public List<Admission> getAllAppliedUsersAdmissionsForFacultyWithDate(int faculty_id, Date date) {
         List<Admission> userAdmission = new ArrayList<>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -897,7 +924,7 @@ public class UserDao {
             pstmt = con.prepareStatement(DaoUserRequest.SELECT_ALL_APPLIED_USERS_ADMISSIONS_FOR_FACULTY);
             pstmt.setInt(1, faculty_id);
 
-            pstmt.setDate(2,date);
+            pstmt.setDate(2, date);
 
             rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -908,7 +935,7 @@ public class UserDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -918,21 +945,22 @@ public class UserDao {
 
     /**
      * Get late final statement for user.
-     * @param userId user id
+     *
+     * @param userId    user id
      * @param facultyId faculty id
-     * @param locale locale
+     * @param locale    locale
      * @return UserFinalStatementResult user final results
      */
     public UserFinalStatementResult getLateFinalStatementResultForFaculty(int userId, int facultyId, String locale) {
-        UserFinalStatementResult userFinalStatementResults=null;
+        UserFinalStatementResult userFinalStatementResults = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Connection con = null;
         String request;
 
-        if(locale.equals("uk")){
+        if (locale.equals("uk")) {
             request = DaoUserRequest.GET_USER_ADMISSION_RESULTS_BY_ID_FACULTY_ID_APPROVED_UA;
-        }else{
+        } else {
             request = DaoUserRequest.GET_USER_ADMISSION_RESULTS_BY_ID_FACULTY_ID_APPROVED;
         }
         try {
@@ -956,13 +984,13 @@ public class UserDao {
                 userFinalStatementResults.setIdn(rs.getLong(DBFields.USER__IDN));
                 userFinalStatementResults.setTotalExamResult(rs.getInt(DBFields.STATEMENT__TOTAL_RESULT));
                 userFinalStatementResults.setCertificatePoint(rs.getInt(DBFields.STATEMENT__CERTIFICATE_POINT));
-                userFinalStatementResults.setIs_approved(rs.getBoolean(DBFields.STATEMENT__IS_APPROVED));
+                userFinalStatementResults.setApproved(rs.getBoolean(DBFields.STATEMENT__IS_APPROVED));
             }
             rs.close();
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -970,25 +998,24 @@ public class UserDao {
     }
 
 
-
-
     /**
      * Get early final statement for user.
-     * @param userId user id
+     *
+     * @param userId    user id
      * @param facultyId faculty id
-     * @param locale locale
+     * @param locale    locale
      * @return UserFinalStatementResult user final results
      */
     public UserFinalStatementResult getFinalStatementResultForFaculty(int userId, int facultyId, String locale) {
-        UserFinalStatementResult userFinalStatementResults=null;
+        UserFinalStatementResult userFinalStatementResults = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Connection con = null;
         String request;
 
-        if(locale.equals("uk")){
+        if (locale.equals("uk")) {
             request = DaoUserRequest.GET_USER_ADMISSION_RESULTS_BY_ID_FACULTY_ID_UA;
-        }else{
+        } else {
             request = DaoUserRequest.GET_USER_ADMISSION_RESULTS_BY_ID_FACULTY_ID;
         }
         try {
@@ -1012,13 +1039,13 @@ public class UserDao {
                 userFinalStatementResults.setIdn(rs.getLong(DBFields.USER__IDN));
                 userFinalStatementResults.setTotalExamResult(rs.getInt(DBFields.STATEMENT__TOTAL_RESULT));
                 userFinalStatementResults.setCertificatePoint(rs.getInt(DBFields.STATEMENT__CERTIFICATE_POINT));
-                userFinalStatementResults.setIs_approved(rs.getBoolean(DBFields.STATEMENT__IS_APPROVED));
+                userFinalStatementResults.setApproved(rs.getBoolean(DBFields.STATEMENT__IS_APPROVED));
             }
             rs.close();
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -1041,7 +1068,7 @@ public class UserDao {
                 user.setEmail(rs.getString(DBFields.USER__EMAIL));
                 user.setIdn(rs.getLong(DBFields.USER__IDN));
                 user.setBlocked(rs.getBoolean(DBFields.USER__BLOCK));
-                user.setUser_role_id(rs.getInt(DBFields.USER__ROLE));
+                user.setUserRoleId(rs.getInt(DBFields.USER__ROLE));
                 user.setPassword(rs.getString(DBFields.USER__PASSWORD));
                 return user;
             } catch (SQLException e) {
@@ -1063,7 +1090,7 @@ public class UserDao {
                 UserResult result = new UserResult();
                 result.setUserId(rs.getInt(DBFields.USER__ID));
                 UserDao userDao = new UserDao();
-                result.setSubject_exam(userDao.findSubjectExam(rs.getInt(DBFields.SUBJECT__EXAM_ID), locale));
+                result.setSubjectExam(userDao.findSubjectExam(rs.getInt(DBFields.SUBJECT__EXAM_ID), locale));
                 result.setResult(rs.getInt(DBFields.RESULT));
                 result.setDateOfExam(rs.getDate(DBFields.DATE_OF_EXAM));
                 return result;
@@ -1085,10 +1112,10 @@ public class UserDao {
             try {
                 Admission admission = new Admission();
                 admission.setId(rs.getInt(DBFields.ENTITY__ID));
-                admission.setUser_id(rs.getInt(DBFields.USER__ID));
-                admission.setFaculty_id(rs.getInt(DBFields.FACULTY__ID));
+                admission.setUserId(rs.getInt(DBFields.USER__ID));
+                admission.setFacultyId(rs.getInt(DBFields.FACULTY__ID));
                 admission.setDate(rs.getDate(DBFields.ADMISSION__DATE));
-                admission.setIs_approved(rs.getBoolean(DBFields.STATEMENT__IS_APPROVED));
+                admission.setApproved(rs.getBoolean(DBFields.STATEMENT__IS_APPROVED));
                 return admission;
             } catch (SQLException e) {
                 throw new IllegalStateException(e);

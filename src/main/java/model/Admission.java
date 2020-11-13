@@ -1,40 +1,31 @@
 package model;
 
-import org.springframework.stereotype.Component;
-
 import java.util.Date;
 import java.util.Objects;
 
 /**
  * Class that describes admission to faculty;
+ *
  * @author Vladislav Prokopenko;
  */
-@Component
+
 public class Admission {
-    /**
-     * ID of admission
-     */
+
     private int id;
 
-    /**
-     * ID of user
-     */
-    private int user_id;
 
-    /**
-     * ID of faculty
-     */
-    private int faculty_id;
+    private int userId;
+
+
+    private int facultyId;
 
     /**
      * Date of admission
      */
     private Date date;
 
-    /**
-     * Is approved admission
-     */
-    private boolean is_approved;
+
+    private boolean isApproved;
 
 
     public int getId() {
@@ -45,20 +36,20 @@ public class Admission {
         this.id = id;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public int getFaculty_id() {
-        return faculty_id;
+    public int getFacultyId() {
+        return facultyId;
     }
 
-    public void setFaculty_id(int faculty_id) {
-        this.faculty_id = faculty_id;
+    public void setFacultyId(int facultyId) {
+        this.facultyId = facultyId;
     }
 
     public Date getDate() {
@@ -69,12 +60,12 @@ public class Admission {
         this.date = date;
     }
 
-    public boolean isIs_approved() {
-        return is_approved;
+    public boolean isApproved() {
+        return isApproved;
     }
 
-    public void setIs_approved(boolean is_approved) {
-        this.is_approved = is_approved;
+    public void setApproved(boolean approved) {
+        this.isApproved = approved;
     }
 
     @Override
@@ -83,25 +74,25 @@ public class Admission {
         if (o == null || getClass() != o.getClass()) return false;
         Admission admission = (Admission) o;
         return id == admission.id &&
-                user_id == admission.user_id &&
-                faculty_id == admission.faculty_id &&
-                is_approved == admission.is_approved &&
+                userId == admission.userId &&
+                facultyId == admission.facultyId &&
+                isApproved == admission.isApproved &&
                 Objects.equals(date, admission.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, user_id, faculty_id, date, is_approved);
+        return Objects.hash(id, userId, facultyId, date, isApproved);
     }
 
     @Override
     public String toString() {
         return "Admission{" +
                 "id=" + id +
-                ", user_id=" + user_id +
-                ", faculty_id=" + faculty_id +
+                ", user_id=" + userId +
+                ", faculty_id=" + facultyId +
                 ", date=" + date +
-                ", is_approved=" + is_approved +
+                ", is_approved=" + isApproved +
                 '}';
     }
 }

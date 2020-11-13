@@ -1,21 +1,15 @@
 package model;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Class that describes user.
+ *
  * @author Vladislav Prokopenko.
  */
-@Component
 public class User {
-    /**
-     * ID of user;
-     */
+
     private int id;
 
-    /**
-     * EMAIL of user;
-     */
+
     private String email;
 
     /**
@@ -23,19 +17,13 @@ public class User {
      */
     private long idn;
 
-    /**
-     * Check if user blocked;
-     */
+
     private boolean blocked;
 
-    /**
-     * User role id;
-     */
-    private int user_role_id;
 
-    /**
-     * User password;
-     */
+    private int userRoleId;
+
+
     private String password;
 
     public int getId() {
@@ -70,12 +58,12 @@ public class User {
         this.blocked = blocked;
     }
 
-    public int getUser_role_id() {
-        return user_role_id;
+    public int getUserRoleId() {
+        return userRoleId;
     }
 
-    public void setUser_role_id(int user_role_id) {
-        this.user_role_id = user_role_id;
+    public void setUserRoleId(int userRoleId) {
+        this.userRoleId = userRoleId;
     }
 
     public String getPassword() {
@@ -93,7 +81,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", idn=" + idn +
                 ", blocked=" + blocked +
-                ", user_role_id=" + user_role_id +
+                ", user_role_id=" + userRoleId +
                 ", password='" + "**********" + '\'' +
                 '}';
     }

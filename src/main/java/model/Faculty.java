@@ -4,38 +4,26 @@ import org.springframework.stereotype.Component;
 
 /**
  * Class that describes faculty;
+ *
  * @author Vladislav Prokopenko;
  */
-@Component
 public class Faculty {
-    /**
-     * ID faculty
-     */
+
     private int id;
 
-    /**
-     * Faculty name
-     */
+
     private String name;
 
-    /**
-     * Faculty description
-     */
+
     private String description;
 
-    /**
-     * Amount of budget places
-     */
+
     private int budgetAmount;
 
-    /**
-     * Amount of total places
-     */
+
     private int totalAmount;
 
-    /**
-     * Logo url
-     */
+
     private String logoUrl;
 
 

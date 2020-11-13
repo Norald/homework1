@@ -1,53 +1,36 @@
 package model;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Class that describes user details.
  * Like name, surname etc.
+ *
  * @author Vladislav Prokopenko.
  */
-@Component
 public class UserDetails {
-    /**
-     * User ID
-     */
+
     private int userId;
 
-    /**
-     * User Name
-     */
     private String name;
 
-    /**
-     * User Surname
-     */
+
     private String surname;
 
-    /**
-     * User patronymic
-     */
+
     private String patronymic;
 
-    /**
-     * User city
-     */
+
     private String city;
 
-    /**
-     * User region
-     */
+
     private String region;
 
-    /**
-     * User school name
-     */
-    private String school_name;
+
+    private String schoolName;
 
     /**
      * User documents url
      */
-    private String document_url;
+    private String documentUrl;
 
     /**
      * User certificate point
@@ -102,20 +85,20 @@ public class UserDetails {
         this.region = region;
     }
 
-    public String getSchool_name() {
-        return school_name;
+    public String getSchoolName() {
+        return schoolName;
     }
 
-    public void setSchool_name(String school_name) {
-        this.school_name = school_name;
+    public void setSchoolName(String schoolName) {
+        this.schoolName = schoolName;
     }
 
-    public String getDocument_url() {
-        return document_url;
+    public String getDocumentUrl() {
+        return documentUrl;
     }
 
-    public void setDocument_url(String document_url) {
-        this.document_url = document_url;
+    public void setDocumentUrl(String documentUrl) {
+        this.documentUrl = documentUrl;
     }
 
     public int getAverage_certificate() {
@@ -135,8 +118,8 @@ public class UserDetails {
                 ", patronymic='" + patronymic + '\'' +
                 ", city='" + city + '\'' +
                 ", region='" + region + '\'' +
-                ", school_name='" + school_name + '\'' +
-                ", document_url='" + document_url + '\'' +
+                ", school_name='" + schoolName + '\'' +
+                ", document_url='" + documentUrl + '\'' +
                 ", average_certificate=" + average_certificate +
                 '}';
     }

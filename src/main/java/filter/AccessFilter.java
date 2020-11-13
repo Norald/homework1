@@ -11,6 +11,7 @@ import java.io.IOException;
 
 /**
  * Access filter. Check if user need authorisation. Opened only for start and registration pages
+ *
  * @author Vladislav Prokopenko
  */
 @WebFilter(filterName = "AccessFilter", urlPatterns = "/app/*")
@@ -23,7 +24,7 @@ public class AccessFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException {
         if (accessAllowed(req)) {
             chain.doFilter(req, resp);
-        } else{
+        } else {
             LOG.warn("Need authorization");
             req.setAttribute("error", "You need authorization");
             req.getRequestDispatcher("/error.jsp")
@@ -37,6 +38,7 @@ public class AccessFilter implements Filter {
 
     /**
      * Check if access allowed
+     *
      * @param request
      * @return true or false
      */
@@ -45,11 +47,11 @@ public class AccessFilter implements Filter {
         String commandName = (String) session.getAttribute("auth");
         if (commandName == null || commandName.isEmpty()) {
             return false;
-        } else if(!commandName.equals("authorised")){
+        } else if (!commandName.equals("authorised")) {
             return false;
-        }else if(commandName.equals("authorised")){
+        } else if (commandName.equals("authorised")) {
             return true;
-        }else{
+        } else {
             return false;
         }
 

@@ -2,6 +2,7 @@ package db.dao;
 
 /**
  * Class with users SQL requests
+ *
  * @author Vladislav Prokopenko
  */
 public class DaoUserRequest {
@@ -21,7 +22,6 @@ public class DaoUserRequest {
     public static final String GET_USER_DETAILS_BY_ID_UA = "SELECT user_id, name_ua, surname_ua, patronymic_ua, city_ua, region_ua, school_name_ua, average_certificate_point FROM user_details WHERE user_id = (?)";
 
 
-
     public static final String GET_ALL_USER_SUBJECTS_BY_EMAIL = "SELECT ur.subject_exam_id FROM users_results ur INNER JOIN user u ON u.id =  ur.user_id WHERE u.email = (?)";
     public static final String GET_ALL_USER_MARKS_BY_EMAIL = "SELECT ur.user_id, ur.subject_exam_id, ur.result, ur.date_of_exam FROM users_results ur INNER JOIN user u ON u.id =  ur.user_id WHERE u.email = (?)";
     public static final String GET_SUBJECT_EXAM_BY_ID = "SELECT * FROM subject_exam WHERE id = (?)";
@@ -37,7 +37,6 @@ public class DaoUserRequest {
     public static final String UPDATE_USER_DETAILS_BY_ID = "UPDATE user_details SET name = (?), surname = (?), patronymic = (?), city = (?), region = (?), school_name = (?), average_certificate_point = (?), name_ua = (?), surname_ua = (?), patronymic_ua = (?), city_ua = (?), region_ua = (?), school_name_ua = (?) WHERE user_id = (?)";
 
 
-
     public static final String GET_ALL_USERS_WITH_LIMIT = "SELECT * FROM user ORDER BY email LIMIT ?,?";
     public static final String GET_TOTAL_COUNT_OF_USERS = "SELECT COUNT(*) FROM user";
 
@@ -48,7 +47,6 @@ public class DaoUserRequest {
     public static final String SET_TO_USER_USER_ROLE_BY_ID = "UPDATE user SET user_role_id = 1 WHERE id = (?)";
 
     public static final String DELETE_ALL_USER_RESULS_BY_SUBJECT_EXAM_ID = "DELETE FROM users_results WHERE subject_exam_id = (?)";
-
 
 
     public static final String SELECT_ALL_USERS_ADMISSIONS_FOR_FACULTY = "SELECT * FROM admission WHERE faculty_id = (?) AND date BETWEEN (?) AND CURDATE();";

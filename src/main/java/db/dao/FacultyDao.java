@@ -5,6 +5,9 @@ import model.SubjectExam;
 import db.DBManager;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,15 +17,21 @@ import java.util.TreeSet;
 
 /**
  * Data access object for faculties entities.
+ *
  * @author Vladislav Prokopenko
  */
+
+@Repository
 public class FacultyDao {
 
     private static final Logger LOG = LogManager.getLogger(FacultyDao.class.getName());
 
+    public FacultyDao() {
+    }
 
     /**
      * Set admission status DISAPPROVED
+     *
      * @param admissionId admission id
      */
     public void disapproveAdmission(int admissionId) {
@@ -36,7 +45,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -45,6 +54,7 @@ public class FacultyDao {
 
     /**
      * Set admission status APPROVED
+     *
      * @param admissionId admission id
      */
     public void approveAdmission(int admissionId) {
@@ -58,7 +68,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -66,22 +76,23 @@ public class FacultyDao {
 
     /**
      * Getting all subject exams with limit.
-     * @param startValue value to start
+     *
+     * @param startValue   value to start
      * @param amountOnPage amount to get from db
-     * @param locale locale
+     * @param locale       locale
      * @return list of Subject Exams
      */
-    public List<SubjectExam> getSubjectExamsWithLimit(int startValue, int amountOnPage, String locale){
+    public List<SubjectExam> getSubjectExamsWithLimit(int startValue, int amountOnPage, String locale) {
         String request;
         String fieldName;
         String fieldDescription;
-        if(locale.equals("uk")){
-            request=DaoFacultyRequests.GET_ALL_SUBJECT_EXAMS_WITH_LIMIT_UA;
-            fieldName=DBFields.SUBJECT__NAME_UA;
-            fieldDescription =DBFields.SUBJECT__DESCRIPTION_UA;
-        }else{
-            request=DaoFacultyRequests.GET_ALL_SUBJECT_EXAMS_WITH_LIMIT;
-            fieldName=DBFields.SUBJECT__NAME;
+        if (locale.equals("uk")) {
+            request = DaoFacultyRequests.GET_ALL_SUBJECT_EXAMS_WITH_LIMIT_UA;
+            fieldName = DBFields.SUBJECT__NAME_UA;
+            fieldDescription = DBFields.SUBJECT__DESCRIPTION_UA;
+        } else {
+            request = DaoFacultyRequests.GET_ALL_SUBJECT_EXAMS_WITH_LIMIT;
+            fieldName = DBFields.SUBJECT__NAME;
             fieldDescription = DBFields.SUBJECT__DESCRIPTION;
         }
         ArrayList<SubjectExam> examsList = new ArrayList<SubjectExam>();
@@ -92,8 +103,8 @@ public class FacultyDao {
             con = DBManager.getInstance().getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(request);
-            pstmt.setInt(1,startValue);
-            pstmt.setInt(2,amountOnPage);
+            pstmt.setInt(1, startValue);
+            pstmt.setInt(2, amountOnPage);
             rs = pstmt.executeQuery();
             while (rs.next()) {
                 SubjectExam subjectExam = new SubjectExam();
@@ -106,7 +117,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -117,10 +128,11 @@ public class FacultyDao {
     /**
      * Getting total count of exams.
      * Need for pagination.
+     *
      * @return count of exams.
      */
-    public int getTotalCountOfSubjectExams(){
-        int result=0;
+    public int getTotalCountOfSubjectExams() {
+        int result = 0;
         Statement stmt = null;
         ResultSet rs = null;
         Connection con = null;
@@ -136,7 +148,7 @@ public class FacultyDao {
             stmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -146,10 +158,11 @@ public class FacultyDao {
     /**
      * Getting total count of faculties.
      * Need for pagination.
+     *
      * @return count of faculties.
      */
-    public int getTotalCountOfFaculty(){
-        int result=0;
+    public int getTotalCountOfFaculty() {
+        int result = 0;
         Statement stmt = null;
         ResultSet rs = null;
         Connection con = null;
@@ -165,7 +178,7 @@ public class FacultyDao {
             stmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -175,12 +188,13 @@ public class FacultyDao {
     /**
      * Get list of all faculties with limit.
      * Order by budget amount.
-     * @param startValue value to start
+     *
+     * @param startValue   value to start
      * @param amountOnPage amount to get from db
-     * @param locale locale
+     * @param locale       locale
      * @return sorted list of faculties
      */
-    public List<Faculty> getFacultiesWithLimitOrderBugdet(int startValue, int amountOnPage, String locale){
+    public List<Faculty> getFacultiesWithLimitOrderBugdet(int startValue, int amountOnPage, String locale) {
         ArrayList<Faculty> facultiesList = new ArrayList<Faculty>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -201,7 +215,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -211,12 +225,13 @@ public class FacultyDao {
     /**
      * Get list of all faculties with limit.
      * Order by total amount.
-     * @param startValue value to start
+     *
+     * @param startValue   value to start
      * @param amountOnPage amount to get from db
-     * @param locale locale
+     * @param locale       locale
      * @return sorted list of faculties
      */
-    public List<Faculty> getFacultiesWithLimitOrderTotal(int startValue, int amountOnPage, String locale){
+    public List<Faculty> getFacultiesWithLimitOrderTotal(int startValue, int amountOnPage, String locale) {
         ArrayList<Faculty> facultiesList = new ArrayList<Faculty>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -237,7 +252,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -247,17 +262,18 @@ public class FacultyDao {
     /**
      * Get list of all faculties with limit.
      * Order by alphabet.
-     * @param startValue value to start
+     *
+     * @param startValue   value to start
      * @param amountOnPage amount to get from db
-     * @param locale locale
+     * @param locale       locale
      * @return sorted list of faculties
      */
-    public List<Faculty> getFacultiesWithLimitOrderAZ(int startValue, int amountOnPage, String locale){
+    public List<Faculty> getFacultiesWithLimitOrderAZ(int startValue, int amountOnPage, String locale) {
         String request;
-        if(locale.equals("uk")){
-            request=DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_AZ_UA;
-        }else{
-            request=DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_AZ;
+        if (locale.equals("uk")) {
+            request = DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_AZ_UA;
+        } else {
+            request = DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_AZ;
         }
         ArrayList<Faculty> facultiesList = new ArrayList<Faculty>();
         PreparedStatement pstmt = null;
@@ -279,7 +295,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -289,17 +305,18 @@ public class FacultyDao {
     /**
      * Get list of all faculties with limit.
      * Order by reverse alphabet.
-     * @param startValue value to start
+     *
+     * @param startValue   value to start
      * @param amountOnPage amount to get from db
-     * @param locale locale
+     * @param locale       locale
      * @return sorted list of faculties
      */
-    public List<Faculty> getFacultiesWithLimitOrderZA(int startValue, int amountOnPage, String locale){
+    public List<Faculty> getFacultiesWithLimitOrderZA(int startValue, int amountOnPage, String locale) {
         String request;
-        if(locale.equals("uk")){
-            request=DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_ZA_UA;
-        }else{
-            request=DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_ZA;
+        if (locale.equals("uk")) {
+            request = DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_ZA_UA;
+        } else {
+            request = DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_ZA;
         }
         ArrayList<Faculty> facultiesList = new ArrayList<Faculty>();
         PreparedStatement pstmt = null;
@@ -321,7 +338,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -354,8 +371,9 @@ public class FacultyDao {
 //    }
 
     /**
-     *  Get faculty by id.
-     * @param id id of faculty
+     * Get faculty by id.
+     *
+     * @param id     id of faculty
      * @param locale locale
      * @return faculty
      */
@@ -376,7 +394,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -384,11 +402,12 @@ public class FacultyDao {
     }
 
     /**
-     *  Get Set of faculty demends;
+     * Get Set of faculty demends;
+     *
      * @param id id of faculty
      * @return Set of faculties
      */
-    public Set<Integer> getFacultyDemends(String id){
+    public Set<Integer> getFacultyDemends(String id) {
         Set<Integer> demendsList = new TreeSet<Integer>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -407,7 +426,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -442,18 +461,19 @@ public class FacultyDao {
 
     /**
      * Get a list of exams that are required by the faculty
-     * @param id faculty id
+     *
+     * @param id     faculty id
      * @param locale locale
      * @return list of exams
      */
-    public List<SubjectExam> getFacultyDemendsWithName(String id, String locale){
-        List <SubjectExam> examList = new ArrayList<>();
+    public List<SubjectExam> getFacultyDemendsWithName(String id, String locale) {
+        List<SubjectExam> examList = new ArrayList<>();
         String request;
 
-        if(locale.equals("en")){
-            request=DaoFacultyRequests.GET_FACULTY_EXAM_DEMENDS_WITH_FACULTY_NAME_BY_ID;
-        }else{
-            request=DaoFacultyRequests.GET_FACULTY_EXAM_DEMENDS_WITH_FACULTY_NAME_BY_ID_UA;
+        if (locale.equals("en")) {
+            request = DaoFacultyRequests.GET_FACULTY_EXAM_DEMENDS_WITH_FACULTY_NAME_BY_ID;
+        } else {
+            request = DaoFacultyRequests.GET_FACULTY_EXAM_DEMENDS_WITH_FACULTY_NAME_BY_ID_UA;
         }
         Set<Integer> demendsList = new TreeSet<Integer>();
         PreparedStatement pstmt = null;
@@ -476,7 +496,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -485,7 +505,8 @@ public class FacultyDao {
 
     /**
      * Delete all faculty demend by exam amd faculty
-     * @param examId id of exam
+     *
+     * @param examId    id of exam
      * @param facultyId id of faculty
      */
     public void deleteExamDemendForFaculty(int examId, int facultyId) {
@@ -500,7 +521,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -508,6 +529,7 @@ public class FacultyDao {
 
     /**
      * Delete all faculty admissions
+     *
      * @param facultyId faculty id
      */
     public void deleteAllFacultyAdmissions(int facultyId) {
@@ -521,7 +543,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -530,21 +552,22 @@ public class FacultyDao {
 
     /**
      * Get list of all subject exams
+     *
      * @param locale locale
      * @return list of subject exams
      */
-    public List<SubjectExam> getAllSubjectExams(String locale){
-        String fieldName="";
-        String fieldDescription="";
-        String request= "";
-        if(locale.equals("en")){
+    public List<SubjectExam> getAllSubjectExams(String locale) {
+        String fieldName = "";
+        String fieldDescription = "";
+        String request = "";
+        if (locale.equals("en")) {
             request = DaoFacultyRequests.GET_ALL_SUBJECTS;
-            fieldName=DBFields.SUBJECT__NAME;
-            fieldDescription=DBFields.SUBJECT__DESCRIPTION;
-        }else{
+            fieldName = DBFields.SUBJECT__NAME;
+            fieldDescription = DBFields.SUBJECT__DESCRIPTION;
+        } else {
             request = DaoFacultyRequests.GET_ALL_SUBJECTS;
-            fieldName=DBFields.SUBJECT__NAME_UA;
-            fieldDescription=DBFields.SUBJECT__DESCRIPTION_UA;
+            fieldName = DBFields.SUBJECT__NAME_UA;
+            fieldDescription = DBFields.SUBJECT__DESCRIPTION_UA;
         }
         List<SubjectExam> subjectsList = new ArrayList<SubjectExam>();
         PreparedStatement pstmt = null;
@@ -566,7 +589,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -576,6 +599,7 @@ public class FacultyDao {
 
     /**
      * Delete faculty
+     *
      * @param facultyId faculty id
      */
     public void deleteFacultyById(int facultyId) {
@@ -589,7 +613,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -597,6 +621,7 @@ public class FacultyDao {
 
     /**
      * Delete all exam demends for faculty
+     *
      * @param facultyId faculty id
      */
     public void deleteExamDemndsFacultyFacultyById(int facultyId) {
@@ -610,7 +635,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -618,6 +643,7 @@ public class FacultyDao {
 
     /**
      * Delete subject exam
+     *
      * @param subjectExamId subject exam id
      */
     public void deleteSubjectExamById(int subjectExamId) {
@@ -631,7 +657,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -639,7 +665,8 @@ public class FacultyDao {
 
     /**
      * Add exam demends for faculty
-     * @param idExam exam id
+     *
+     * @param idExam    exam id
      * @param idFaculty faculty id
      */
     public void addExamDemendForFaculty(int idExam, int idFaculty) {
@@ -655,7 +682,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -663,11 +690,12 @@ public class FacultyDao {
 
     /**
      * Adding faculty
-     * @param name faculty name
-     * @param budget_amount budget amount of places in faculty
-     * @param total_amount total amount of places in faculty
-     * @param description faculty description
-     * @param name_ua faculty name in ukrainian
+     *
+     * @param name           faculty name
+     * @param budget_amount  budget amount of places in faculty
+     * @param total_amount   total amount of places in faculty
+     * @param description    faculty description
+     * @param name_ua        faculty name in ukrainian
      * @param description_ua faculty description in ukrainian
      */
     public void addFaculty(String name, int budget_amount, int total_amount, String description, String name_ua, String description_ua) {
@@ -686,7 +714,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -694,9 +722,10 @@ public class FacultyDao {
 
     /**
      * Adding subject exam
-     * @param name name of subject exam
-     * @param description description of subject exam
-     * @param name_ua name of subject exam in ukrainian
+     *
+     * @param name           name of subject exam
+     * @param description    description of subject exam
+     * @param name_ua        name of subject exam in ukrainian
      * @param description_ua description of subject exam in ukrainian
      */
     public void addSubjectExam(String name, String description, String name_ua, String description_ua) {
@@ -713,7 +742,7 @@ public class FacultyDao {
             pstmt.close();
         } catch (SQLException ex) {
 //            DBManager.getInstance().rollbackAndClose(con);
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         } finally {
             DBManager.getInstance().commitAndClose(con);
         }
@@ -727,14 +756,14 @@ public class FacultyDao {
 
         public Faculty mapRow(ResultSet rs, String locale) {
             try {
-                String fieldName="";
-                String fieldDescription= "";
-                if(locale.equals("en")){
-                    fieldName=DBFields.FACULTY__NAME;
-                    fieldDescription=DBFields.FACULTY__DESCRIPTION;
-                }else{
-                    fieldName=DBFields.FACULTY__NAME_UA;
-                    fieldDescription=DBFields.FACULTY__DESCRIPTION_UA;
+                String fieldName = "";
+                String fieldDescription = "";
+                if (locale.equals("en")) {
+                    fieldName = DBFields.FACULTY__NAME;
+                    fieldDescription = DBFields.FACULTY__DESCRIPTION;
+                } else {
+                    fieldName = DBFields.FACULTY__NAME_UA;
+                    fieldDescription = DBFields.FACULTY__DESCRIPTION_UA;
                 }
                 Faculty faculty = new Faculty();
                 faculty.setId(rs.getInt(DBFields.ENTITY__ID));

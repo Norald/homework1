@@ -8,6 +8,7 @@ import java.io.IOException;
 
 /**
  * Encoding filter. Set base encoding UTF-8.
+ *
  * @author Vladislav Prokopenko
  */
 @WebFilter(filterName = "EncodingFilter", urlPatterns = "/*", initParams = @WebInitParam(name = "encoding", value = "UTF-8"))
@@ -18,7 +19,7 @@ public class EncodingFilter implements Filter {
     }
 
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException {
-        HttpServletRequest httpRequest = (HttpServletRequest)req;
+        HttpServletRequest httpRequest = (HttpServletRequest) req;
         String requestEncoding = req.getCharacterEncoding();
         if (requestEncoding == null) {
             req.setCharacterEncoding(encoding);

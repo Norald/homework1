@@ -6,23 +6,18 @@ import java.util.Objects;
 
 /**
  * Class that describes subject exam.
+ *
  * @author Vladislav Prokopenko.
  */
-@Component
+
 public class SubjectExam {
-    /**
-     * ID subject exam;
-     */
+
     private int id;
 
-    /**
-     * Name of subject exam;
-     */
+
     private String name;
 
-    /**
-     * Description of subject exam;
-     */
+
     private String description;
 
     public int getId() {

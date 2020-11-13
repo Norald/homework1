@@ -1,34 +1,24 @@
 package model;
 
-import org.springframework.stereotype.Component;
-
 import java.sql.Date;
 
 /**
  * Class that describes user result.
  * Like exam and mark, etc.
+ *
  * @author Vladislav Prokopenko.
  */
-@Component
 public class UserResult {
-    /**
-     * User id;
-     */
+
     private int userId;
 
-    /**
-     * Subject exam;
-     */
-    private SubjectExam subject_exam;
 
-    /**
-     * Result for exam;
-     */
+    private SubjectExam subjectExam;
+
+
     private int result;
 
-    /**
-     * Date of exam;
-     */
+
     private Date dateOfExam;
 
     public int getUserId() {
@@ -39,12 +29,12 @@ public class UserResult {
         this.userId = userId;
     }
 
-    public SubjectExam getSubject_exam() {
-        return subject_exam;
+    public SubjectExam getSubjectExam() {
+        return subjectExam;
     }
 
-    public void setSubject_exam(SubjectExam subject_exam) {
-        this.subject_exam = subject_exam;
+    public void setSubjectExam(SubjectExam subjectExam) {
+        this.subjectExam = subjectExam;
     }
 
     public int getResult() {
@@ -67,7 +57,7 @@ public class UserResult {
     public String toString() {
         return "UserResult{" +
                 "userId=" + userId +
-                ", subject_exam=" + subject_exam +
+                ", subject_exam=" + subjectExam +
                 ", result=" + result +
                 ", dateOfExam=" + dateOfExam +
                 '}';

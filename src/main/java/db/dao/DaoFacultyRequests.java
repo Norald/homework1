@@ -1,6 +1,8 @@
 package db.dao;
+
 /**
  * Class with faculties SQL requests
+ *
  * @author Vladislav Prokopenko
  */
 public class DaoFacultyRequests {

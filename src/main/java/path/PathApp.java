@@ -2,6 +2,7 @@ package path;
 
 /**
  * Class, which contain all path`s in app
+ *
  * @author Vladislav Prokopenko
  */
 public final class PathApp {

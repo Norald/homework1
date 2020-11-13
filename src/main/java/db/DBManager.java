@@ -13,6 +13,7 @@ import java.sql.SQLException;
 /**
  * Database manager class. Works with Mysql.
  * Using data pool connection.
+ *
  * @author Prokopenko Vladislav
  * @since 25.09.2020
  */
@@ -40,13 +41,13 @@ public class DBManager {
         try {
 
             Context initContext = new InitialContext();
-            Context envContext  = (Context)initContext.lookup("java:/comp/env");
+            Context envContext = (Context) initContext.lookup("java:/comp/env");
 
             // iinspection_board - the name of data source
-            DataSource ds = (DataSource)envContext.lookup("jdbc/board");
+            DataSource ds = (DataSource) envContext.lookup("jdbc/board");
             con = ds.getConnection();
         } catch (NamingException ex) {
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         }
         return con;
     }
@@ -55,32 +56,30 @@ public class DBManager {
     /**
      * Commits and close the given connection.
      *
-     * @param con
-     *            Connection to be committed and closed.
+     * @param con Connection to be committed and closed.
      */
     public void commitAndClose(Connection con) {
         try {
-            if(con!=null) {
+            if (con != null) {
                 con.commit();
                 con.close();
             }
         } catch (SQLException ex) {
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         }
     }
 
     /**
      * Rollbacks and close the given connection.
      *
-     * @param con
-     *            Connection to be rollbacked and closed.
+     * @param con Connection to be rollbacked and closed.
      */
     public void rollbackAndClose(Connection con) {
         try {
             con.rollback();
             con.close();
         } catch (SQLException ex) {
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
         }
     }
 }
