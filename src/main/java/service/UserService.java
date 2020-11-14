@@ -1,10 +1,7 @@
 package service;
 
 import db.dao.UserDao;
-import model.Admission;
-import model.User;
-import model.UserDetails;
-import model.UserResult;
+import model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -95,5 +92,50 @@ public class UserService {
 
     public void updateDetails(String name, String surname, String patronymic, String city, String region, String schoolName, int averageCertificatePoint, String nameUa, String surnameUa, String patronymicUa, String cityUa, String regionUa, String schoolNameUa, int idUser) {
         userDao.updateDetails(name, surname, patronymic, city, region, schoolName, averageCertificatePoint, nameUa, surnameUa, patronymicUa, cityUa, regionUa, schoolNameUa, idUser);
+    }
+
+    public void deleteAllResultsBySubjectExamId(int subjectExamId) {
+        userDao.deleteAllResultsBySubjectExamId(subjectExamId);
+    }
+
+    public int getTotalCountOfUsers() {
+        return userDao.getTotalCountOfUsers();
+    }
+
+    public List<User> findAllUsersWithLimit(int startValue, int amountOnPage) {
+        return userDao.findAllUsersWithLimit(startValue, amountOnPage);
+    }
+
+    public void blockUserById(int userId) {
+        userDao.blockUserById(userId);
+    }
+
+    public void unblockUserById(int userId) {
+        userDao.unblockUserById(userId);
+    }
+
+    public void makeUserAdmin(int userId) {
+        userDao.makeUserAdmin(userId);
+    }
+
+    public void makeAdminUser(int userId) {
+        userDao.makeAdminUser(userId);
+    }
+
+
+    public List<Admission> getAllUsersAdmissionsForFacultyWithDate(int faculty_id, Date date) {
+        return userDao.getAllUsersAdmissionsForFacultyWithDate(faculty_id, date);
+    }
+
+    public List<Admission> getAllAppliedUsersAdmissionsForFacultyWithDate(int faculty_id, Date date) {
+        return userDao.getAllAppliedUsersAdmissionsForFacultyWithDate(faculty_id, date);
+    }
+
+    public UserFinalStatementResult getFinalStatementResultForFaculty(int userId, int facultyId, String locale) {
+        return userDao.getFinalStatementResultForFaculty(userId, facultyId, locale);
+    }
+
+    public UserFinalStatementResult getAllAppliedUsersAdmissionsForFacultyWithDate(int userId, int facultyId, String locale) {
+        return userDao.getLateFinalStatementResultForFaculty(userId, facultyId, locale);
     }
 }

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import path.PathApp;
+import pdf.StatementWorker;
+import service.FacultyService;
+import service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,15 +28,16 @@ import java.util.*;
 public class UserActionsController {
     private static final Logger LOG = LogManager.getLogger(UserActionsController.class.getName());
 
-    private UserDao userDao;
-    private FacultyDao facultyDao;
+    private UserService userService;
+    private FacultyService facultyService;
+    private StatementWorker statementWorker;
 
     @Autowired
-    public UserActionsController(UserDao userDao, FacultyDao facultyDao) {
-        this.userDao = userDao;
-        this.facultyDao = facultyDao;
+    public UserActionsController(UserService userService, FacultyService facultyService, StatementWorker statementWorker) {
+        this.userService = userService;
+        this.facultyService = facultyService;
+        this.statementWorker = statementWorker;
     }
-
 
     @RequestMapping(value = "/app/faculties")
     public ModelAndView showListOfFaculties(HttpServletRequest request) {
@@ -70,7 +74,7 @@ public class UserActionsController {
         }
 
 //        FacultyDao facultyDao = new FacultyDao();
-        int rows = facultyDao.getTotalCountOfFaculty();
+        int rows = facultyService.getCountOfFaculties();
 
         int nOfPages = rows / facultyCountOnPage;
 
@@ -84,13 +88,13 @@ public class UserActionsController {
 
         List<Faculty> faculties = null;
         if (sort.equals("sortAZ")) {
-            faculties = facultyDao.getFacultiesWithLimitOrderAZ(startValue, facultyCountOnPage, locale);
+            faculties = facultyService.getFacultiesWithLimitOrderAZ(startValue, facultyCountOnPage, locale);
         } else if (sort.equals("sortZA")) {
-            faculties = facultyDao.getFacultiesWithLimitOrderZA(startValue, facultyCountOnPage, locale);
+            faculties = facultyService.getFacultiesWithLimitOrderZA(startValue, facultyCountOnPage, locale);
         } else if (sort.equals("sortBudget")) {
-            faculties = facultyDao.getFacultiesWithLimitOrderBugdet(startValue, facultyCountOnPage, locale);
+            faculties = facultyService.getFacultiesWithLimitOrderBugdet(startValue, facultyCountOnPage, locale);
         } else {
-            faculties = facultyDao.getFacultiesWithLimitOrderTotal(startValue, facultyCountOnPage, locale);
+            faculties = facultyService.getFacultiesWithLimitOrderTotal(startValue, facultyCountOnPage, locale);
         }
         if (!faculties.isEmpty()) {
             LOG.info("Getting faculties successful");
@@ -125,10 +129,10 @@ public class UserActionsController {
 
 
             //find user
-            User user = userDao.findUser(userEmail);
+            User user = userService.findUser(userEmail);
 
             //adding mark for user
-            userDao.addUserMark(user.getId(), Integer.parseInt(examId), Integer.parseInt(mark));
+            userService.addUserMark(user.getId(), Integer.parseInt(examId), Integer.parseInt(mark));
             modelAndView.setViewName("redirect:/app/marks");
 //            response.sendRedirect("/app/marks");
             return modelAndView;
@@ -150,9 +154,9 @@ public class UserActionsController {
         String locale = (String) request.getSession().getAttribute("language");
 
         //getting user exams
-        List<UserResult> results = userDao.findUserResult((String) request.getSession().getAttribute("email"), locale);
+        List<UserResult> results = userService.findUserResults((String) request.getSession().getAttribute("email"), locale);
         //getting all exams
-        List<SubjectExam> exams = facultyDao.getAllSubjectExams(locale);
+        List<SubjectExam> exams = facultyService.getAllSubjectExamsForFaculty(locale);
 
 
         //we delete the user's choice so that he cannot re-select the same subject for which he has already contributed points
@@ -187,12 +191,12 @@ public class UserActionsController {
             return modelAndView;
         } else {
             String userEmail = (String) request.getSession().getAttribute("email");
-            User user = userDao.findUser(userEmail);
+            User user = userService.findUser(userEmail);
 
-            userDao.removeUserResults(user.getId(), Integer.parseInt(userid));
+            userService.removeUserResult(user.getId(), Integer.parseInt(userid));
 
             //if user delete his marks - all his admissions will be deleted
-            userDao.removeUserAdmissions(user.getId());
+            userService.removeUserAdmissions(user.getId());
             request.getSession().removeAttribute("admissions map");
             modelAndView.setViewName("redirect:/app/marks");
             return modelAndView;
@@ -208,10 +212,10 @@ public class UserActionsController {
         String locale = (String) request.getSession().getAttribute("language");
 
 
-        User user = userDao.findUser((String) request.getSession().getAttribute("email"));
+        User user = userService.findUser((String) request.getSession().getAttribute("email"));
 
         //getting all user admissions
-        Map<String, Date> mapOfAdmissions = userDao.findUserAdmissions(user, locale);
+        Map<String, Date> mapOfAdmissions = userService.findUserAdmissions(user, locale);
 
         HttpSession session = request.getSession();
 
@@ -232,12 +236,12 @@ public class UserActionsController {
 
         //check if faculty name is empty
         if (!faculty_Name.isEmpty()) {
-            User user = userDao.findUser((String) request.getSession().getAttribute("email"));
+            User user = userService.findUser((String) request.getSession().getAttribute("email"));
             //deleting admission
-            userDao.deleteUserAdmission(user.getId(), faculty_Name, locale);
+            userService.deleteUserAdmission(user.getId(), faculty_Name, locale);
 
             //update all user admissions, user admissions contains in session
-            Map<String, Date> mapOfAdmissions = userDao.findUserAdmissions(user, locale);
+            Map<String, Date> mapOfAdmissions = userService.findUserAdmissions(user, locale);
             request.getSession().removeAttribute("admissions map");
 
             request.getSession().setAttribute("admissions map", mapOfAdmissions);
@@ -266,17 +270,17 @@ public class UserActionsController {
             modelAndView.setViewName("error");
             return modelAndView;
         } else {
-            Faculty faculty = facultyDao.findFacultyById(id, locale);
+            Faculty faculty = facultyService.findFacultyById(id, locale);
             if (faculty == null) {
                 LOG.warn("No such faculty");
                 request.setAttribute("error", rb.getString("error.no.such.faculty"));
                 modelAndView.setViewName("error");
                 return modelAndView;
             } else {
-                Set<Integer> facultyDemends = facultyDao.getFacultyDemends(id);
+                Set<Integer> facultyDemends = facultyService.getFacultyDemends(id);
 
-                Set<Integer> userSubjects = userDao.getUserSubjects((String) request.getSession().getAttribute("email"));
-                faculty = facultyDao.findFacultyById(id, locale);
+                Set<Integer> userSubjects = userService.getUserSubjects((String) request.getSession().getAttribute("email"));
+                faculty = facultyService.findFacultyById(id, locale);
 
                 request.setAttribute("faculty", faculty);
                 //user can pass more than 3 exams, check if user exams is good for faculty demends
@@ -311,10 +315,10 @@ public class UserActionsController {
             return modelAndView;
         } else {
 
-            User user = userDao.findUser((String) request.getSession().getAttribute("email"));
+            User user = userService.findUser((String) request.getSession().getAttribute("email"));
 
-            List<Admission> listAdmission = userDao.getUserAdmissionForFaculty(user.getId(), Integer.parseInt(faculty_id));
-            Set<Integer> list = facultyDao.getFacultyDemends(faculty_id);
+            List<Admission> listAdmission = userService.getUserAdmissionForFaculty(user.getId(), Integer.parseInt(faculty_id));
+            Set<Integer> list = facultyService.getFacultyDemends(faculty_id);
 
 
             //If faculty have no demends, user can`t apply
@@ -326,8 +330,8 @@ public class UserActionsController {
 
             } else if (listAdmission.isEmpty()) {
 
-                userDao.addUserAdmissionToFaculty(user.getId(), Integer.parseInt(faculty_id));
-                Map<String, Date> mapOfAdmissions = userDao.findUserAdmissions(user, locale);
+                userService.addUserAdmissionToFaculty(user.getId(), Integer.parseInt(faculty_id));
+                Map<String, Date> mapOfAdmissions = userService.findUserAdmissions(user, locale);
                 //update map of admissions in session
                 request.getSession().removeAttribute("admissions map");
                 request.getSession().setAttribute("admissions map", mapOfAdmissions);
@@ -353,12 +357,12 @@ public class UserActionsController {
         //getting locale for errors
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
-        User user = userDao.findUser((String) request.getSession().getAttribute("email"));
+        User user = userService.findUser((String) request.getSession().getAttribute("email"));
 
         //getting details for both locales: uk and en
         //we show all user details
-        UserDetails userDetails1 = userDao.findUserDetails(user, "uk");
-        UserDetails userDetails2 = userDao.findUserDetails(user, "en");
+        UserDetails userDetails1 = userService.findUserDetails(user, "uk");
+        UserDetails userDetails2 = userService.findUserDetails(user, "en");
 
         //check if we have such user
         if (userDetails1 != null && userDetails2 != null) {
@@ -416,10 +420,10 @@ public class UserActionsController {
             return modelAndView;
         } else {
             //find user by email, show us if such email exists
-            User user = userDao.findUser(email);
+            User user = userService.findUser(email);
 
             //get user from session
-            User sessionUser = userDao.findUser((String) request.getSession().getAttribute("email"));
+            User sessionUser = userService.findUser((String) request.getSession().getAttribute("email"));
 
             //if email exists
             if (user != null && !user.getEmail().equals(sessionUser.getEmail())) {
@@ -428,7 +432,7 @@ public class UserActionsController {
                 modelAndView.setViewName("error");
                 return modelAndView;
             }
-            user = userDao.findUserByIdn(idn);
+            user = userService.findUserByIdn(idn);
 
             //if identification number exists
             if (user != null && user.getIdn() != sessionUser.getIdn()) {
@@ -445,10 +449,10 @@ public class UserActionsController {
 
 
                 //updating user and user details
-                userDao.updateUser(email, Long.parseLong(idn), pass1, sessionUser.getId());
-                userDao.updateDetails(name, surname, patronymic, city, region, school_name, Integer.parseInt(average_certificate_point), name_ua, surname_ua, patronymic_ua, city_ua, region_ua, school_name_ua, sessionUser.getId());
+                userService.updateUser(email, Long.parseLong(idn), pass1, sessionUser.getId());
+                userService.updateDetails(name, surname, patronymic, city, region, school_name, Integer.parseInt(average_certificate_point), name_ua, surname_ua, patronymic_ua, city_ua, region_ua, school_name_ua, sessionUser.getId());
                 //if user changed his details - all user admission will delete
-                userDao.removeUserAdmissions(sessionUser.getId());
+                userService.removeUserAdmissions(sessionUser.getId());
                 modelAndView.setViewName("redirect:/app/personalInfo");
                 return modelAndView;
             }
@@ -459,15 +463,7 @@ public class UserActionsController {
     @RequestMapping(value = "/app/statements")
     public ModelAndView showListOfStatements(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView();
-
-        //todo refactor
-
-        String path = PathApp.STATEMENTS_FOLDER;
-        File folder = new File(path);
-        //getting list of files and showing them to users
-        File[] listOfFiles = folder.listFiles();
-
-        request.setAttribute("files", listOfFiles);
+        request.setAttribute("files", statementWorker.getListOfStatements(PathApp.STATEMENTS_FOLDER));
         modelAndView.setViewName("app/all_statements");
         return modelAndView;
     }
@@ -476,35 +472,18 @@ public class UserActionsController {
     public void downloadStatement(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ModelAndView modelAndView = new ModelAndView();
 
-        //todo refactor
-//getting locale
-
+        //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
-        //if there are no parameter 'name'
-//        if(request.getParameter("name")==null){
-//            LOG.warn("Empty parameter");
-//            request.setAttribute("error", rb.getString("error.empty.parameter"));
-//            modelAndView.setViewName("error");
-//            return modelAndView;
-//        }else
-//            {
+
         String filename = request.getParameter("name");
 
         //find file with this name and return it to user
         OutputStream out = response.getOutputStream();
         response.setContentType("application/pdf");
 
-        FileInputStream in = new FileInputStream(PathApp.STATEMENTS_FOLDER + "/" + filename);
-        byte[] buffer = new byte[4096];
-        int length;
-        while ((length = in.read(buffer)) > 0) {
-            out.write(buffer, 0, length);
-        }
-        in.close();
-        out.flush();
-//        }
+        statementWorker.downloadStatement(PathApp.STATEMENTS_FOLDER + "/" + filename, out);
     }
 }

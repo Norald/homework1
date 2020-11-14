@@ -11,26 +11,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import path.PathApp;
 import pdf.CreateStatement;
+import pdf.StatementWorker;
+import service.FacultyService;
+import service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
 public class AdminActionsController {
-    private UserDao userDao;
-    private FacultyDao facultyDao;
+    private UserService userService;
+    private FacultyService facultyService;
     private CreateStatement statement;
+    private StatementWorker worker;
     private static final Logger LOG = LogManager.getLogger(AdminActionsController.class.getName());
 
 
     @Autowired
-    public AdminActionsController(UserDao userDao, FacultyDao facultyDao, CreateStatement statement) {
-        this.userDao = userDao;
-        this.facultyDao = facultyDao;
+    public AdminActionsController(UserService userService, FacultyService facultyService, CreateStatement statement, StatementWorker worker) {
+        this.userService = userService;
+        this.facultyService = facultyService;
         this.statement = statement;
+        this.worker = worker;
     }
 
 
@@ -60,7 +66,7 @@ public class AdminActionsController {
         }
 
 
-        int rows = facultyDao.getTotalCountOfFaculty();
+        int rows = facultyService.getCountOfFaculties();
         int nOfPages = rows / facultyCountOnPage;
 
         if (nOfPages % facultyCountOnPage > 0) {
@@ -71,7 +77,7 @@ public class AdminActionsController {
         }
 
         List<Faculty> faculties = null;
-        faculties = facultyDao.getFacultiesWithLimitOrderAZ(startValue, facultyCountOnPage, locale);
+        faculties = facultyService.getFacultiesWithLimitOrderAZ(startValue, facultyCountOnPage, locale);
 
         if (!faculties.isEmpty()) {
             //attributes for pagination
@@ -110,7 +116,7 @@ public class AdminActionsController {
             String budget_amount = request.getParameter("budget_amount");
             String total_amount = request.getParameter("total_amount");
             //add new faculty
-            facultyDao.addFaculty(name, Integer.parseInt(budget_amount), Integer.parseInt(total_amount), description, name_ua, description_ua);
+            facultyService.addFaculty(name, Integer.parseInt(budget_amount), Integer.parseInt(total_amount), description, name_ua, description_ua);
             modelAndView.setViewName("redirect:/app/admin/all_faculties");
             return modelAndView;
         }
@@ -130,9 +136,9 @@ public class AdminActionsController {
         } else {
             String id = request.getParameter("id");
             //DELETE ALL ADMISSIONS AND DEMENDS IF FACULTY DELETED!
-            facultyDao.deleteFacultyById(Integer.parseInt(id));
-            facultyDao.deleteExamDemndsFacultyFacultyById(Integer.parseInt(id));
-            facultyDao.deleteAllFacultyAdmissions(Integer.parseInt(id));
+            facultyService.deleteFacultyById(Integer.parseInt(id));
+            facultyService.deleteExamDemndsFacultyById(Integer.parseInt(id));
+            facultyService.deleteAllFacultyAdmissions(Integer.parseInt(id));
             modelAndView.setViewName("redirect:/app/admin/all_faculties");
             return modelAndView;
         }
@@ -158,7 +164,7 @@ public class AdminActionsController {
             startValue = (pageSubjectExam - 1) * facultyCountOnPage;
         }
 
-        int rows = facultyDao.getTotalCountOfSubjectExams();
+        int rows = facultyService.getTotalCountOfSubjectExams();
         int nOfPages = rows / facultyCountOnPage;
 
         if (nOfPages % facultyCountOnPage > 0) {
@@ -169,7 +175,7 @@ public class AdminActionsController {
         }
 
         List<SubjectExam> subjectExams = null;
-        subjectExams = facultyDao.getSubjectExamsWithLimit(startValue, facultyCountOnPage, locale);
+        subjectExams = facultyService.getSubjectExamsWithLimit(startValue, facultyCountOnPage, locale);
 
         if (!subjectExams.isEmpty()) {
             request.setAttribute("subjectExams", subjectExams);
@@ -204,7 +210,7 @@ public class AdminActionsController {
             String description = request.getParameter("description");
             String description_ua = request.getParameter("description_ua");
             //add exam
-            facultyDao.addSubjectExam(name, name_ua, description, description_ua);
+            facultyService.addSubjectExam(name, name_ua, description, description_ua);
             modelAndView.setViewName("redirect:/app/admin/subject_exams");
             return modelAndView;
         }
@@ -223,14 +229,12 @@ public class AdminActionsController {
             return modelAndView;
         } else {
             String id = request.getParameter("id");
-            FacultyDao facultyDao = new FacultyDao();
             //DELETE admissions if subject exam deleted
-            facultyDao.deleteSubjectExamById(Integer.parseInt(id));
-            UserDao userDao = new UserDao();
-            userDao.deleteAllResultsBySubjectExamId(Integer.parseInt(id));
-            Set<Integer> facultiesId = facultyDao.getFacultyDemends(id);
+            facultyService.deleteSubjectExamById(Integer.parseInt(id));
+            userService.deleteAllResultsBySubjectExamId(Integer.parseInt(id));
+            Set<Integer> facultiesId = facultyService.getFacultyDemends(id);
             for (Integer i : facultiesId) {
-                facultyDao.deleteAllFacultyAdmissions(i);
+                facultyService.deleteAllFacultyAdmissions(i);
             }
             modelAndView.setViewName("redirect:/app/admin/subject_exams");
             return modelAndView;
@@ -257,7 +261,7 @@ public class AdminActionsController {
             startValue = (pageFaculty - 1) * facultyCountOnPage;
         }
 
-        int rows = userDao.getTotalCountOfUsers();
+        int rows = userService.getTotalCountOfUsers();
         int nOfPages = rows / facultyCountOnPage;
 
         if (nOfPages % facultyCountOnPage > 0) {
@@ -268,7 +272,7 @@ public class AdminActionsController {
         }
 
         List<User> users = null;
-        users = userDao.findAllUsersWithLimit(startValue, facultyCountOnPage);
+        users = userService.findAllUsersWithLimit(startValue, facultyCountOnPage);
 
         //System.out.println(Arrays.asList(faculties));
         if (!users.isEmpty()) {
@@ -300,15 +304,14 @@ public class AdminActionsController {
         } else if (request.getParameter("operation").equals("block") || request.getParameter("operation").equals("unblock")) {
             String operation = request.getParameter("operation");
             String userId = request.getParameter("id");
-            UserDao userDao = new UserDao();
             //if operation 'block' - then block user
             if (operation.equals("block")) {
-                userDao.blockUserById(Integer.parseInt(userId));
+                userService.blockUserById(Integer.parseInt(userId));
                 modelAndView.setViewName("redirect:/app/admin/users");
                 return modelAndView;
 
             } else {//else - unblock user
-                userDao.unblockUserById(Integer.parseInt(userId));
+                userService.unblockUserById(Integer.parseInt(userId));
                 modelAndView.setViewName("redirect:/app/admin/users");
                 return modelAndView;
             }
@@ -336,15 +339,14 @@ public class AdminActionsController {
         } else if (request.getParameter("operation").equals("makeUser") || request.getParameter("operation").equals("makeAdmin")) {
             String operation = request.getParameter("operation");
             String userId = request.getParameter("id");
-            UserDao userDao = new UserDao();
             //if operation - makeAdmin, set to user Admin role
             if (operation.equals("makeAdmin")) {
-                userDao.makeUserAdmin(Integer.parseInt(userId));
+                userService.makeUserAdmin(Integer.parseInt(userId));
                 modelAndView.setViewName("redirect:/app/admin/users");
                 return modelAndView;
 
             } else {//set to admin User role
-                userDao.makeAdminUser(Integer.parseInt(userId));
+                userService.makeAdminUser(Integer.parseInt(userId));
                 modelAndView.setViewName("redirect:/app/admin/users");
                 return modelAndView;
             }
@@ -372,9 +374,9 @@ public class AdminActionsController {
             } else {
                 idFaculty = request.getParameter("id");
             }
-            List<SubjectExam> examList = facultyDao.getFacultyDemendsWithName(idFaculty, locale);
-            List<SubjectExam> examFullList = facultyDao.getAllSubjectExams(locale);
-            Faculty faculty = facultyDao.findFacultyById(idFaculty, locale);
+            List<SubjectExam> examList = facultyService.getFacultyDemendsWithName(idFaculty, locale);
+            List<SubjectExam> examFullList = facultyService.getAllSubjectExams(locale);
+            Faculty faculty = facultyService.findFacultyById(idFaculty, locale);
             examFullList.removeAll(examList);
             request.getSession().removeAttribute("id");
 
@@ -394,6 +396,7 @@ public class AdminActionsController {
 
     @RequestMapping(value = "/app/admin/faculty_demend")
     public ModelAndView addFacultyDemend(HttpServletRequest request) {
+
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -409,12 +412,12 @@ public class AdminActionsController {
             String examId = request.getParameter("demendSelect");
             String facultyId = request.getParameter("idFaculty");
             //add exam demend for faculty
-            facultyDao.addExamDemendForFaculty(Integer.parseInt(examId), Integer.parseInt(facultyId));
+            facultyService.addExamDemendForFaculty(Integer.parseInt(examId), Integer.parseInt(facultyId));
             //if demends changed - all admissions should be deleted
-            facultyDao.deleteAllFacultyAdmissions(Integer.parseInt(facultyId));
-            Faculty faculty = facultyDao.findFacultyById(facultyId, locale);
-            List<SubjectExam> examList = facultyDao.getFacultyDemendsWithName(facultyId, locale);
-            List<SubjectExam> examFullList = facultyDao.getAllSubjectExams(locale);
+            facultyService.deleteAllFacultyAdmissions(Integer.parseInt(facultyId));
+            Faculty faculty = facultyService.findFacultyById(facultyId, locale);
+            List<SubjectExam> examList = facultyService.getFacultyDemendsWithName(facultyId, locale);
+            List<SubjectExam> examFullList = facultyService.getAllSubjectExams(locale);
             examFullList.removeAll(examList);
             System.out.println(facultyId);
             request.getSession().setAttribute("id", facultyId);
@@ -442,13 +445,13 @@ public class AdminActionsController {
             String idExam = request.getParameter("idExam");
 
             //getting faculty
-            Faculty faculty = facultyDao.findFacultyById(idFaculty, locale);
+            Faculty faculty = facultyService.findFacultyById(idFaculty, locale);
             //if deleting demend, all admissions will be deleted too
-            facultyDao.deleteExamDemendForFaculty(Integer.parseInt(idExam), Integer.parseInt(idFaculty));
-            facultyDao.deleteAllFacultyAdmissions(Integer.parseInt(idFaculty));
+            facultyService.deleteExamDemendForFaculty(Integer.parseInt(idExam), Integer.parseInt(idFaculty));
+            facultyService.deleteAllFacultyAdmissions(Integer.parseInt(idFaculty));
             //remove values from dropdown list
-            List<SubjectExam> examFullList = facultyDao.getAllSubjectExams(locale);
-            List<SubjectExam> examList = facultyDao.getFacultyDemendsWithName(idFaculty, locale);
+            List<SubjectExam> examFullList = facultyService.getAllSubjectExams(locale);
+            List<SubjectExam> examList = facultyService.getFacultyDemendsWithName(idFaculty, locale);
             examFullList.removeAll(examList);
             request.setAttribute("faculty", faculty);
             request.setAttribute("examAvailableList", examFullList);
@@ -479,7 +482,7 @@ public class AdminActionsController {
             startValue = (pageFaculty - 1) * facultyCountOnPage;
         }
 
-        int rows = facultyDao.getTotalCountOfFaculty();
+        int rows = facultyService.getCountOfFaculties();
         int nOfPages = rows / facultyCountOnPage;
 
         if (nOfPages % facultyCountOnPage > 0) {
@@ -490,7 +493,7 @@ public class AdminActionsController {
         }
 
         List<Faculty> faculties = null;
-        faculties = facultyDao.getFacultiesWithLimitOrderAZ(startValue, facultyCountOnPage, locale);
+        faculties = facultyService.getFacultiesWithLimitOrderAZ(startValue, facultyCountOnPage, locale);
 
         if (!faculties.isEmpty()) {
             request.setAttribute("facultiesList", faculties);
@@ -526,14 +529,13 @@ public class AdminActionsController {
 
 
             //find faculty
-            Faculty faculty = facultyDao.findFacultyById(idFaculty, locale);
-            UserDao userDao = new UserDao();
+            Faculty faculty = facultyService.findFacultyById(idFaculty, locale);
             //find all admissions for faculty
-            List<Admission> admissionList = userDao.getAllUsersAdmissionsForFacultyWithDate(Integer.parseInt(idFaculty), getDateFromString(date));
+            List<Admission> admissionList = userService.getAllUsersAdmissionsForFacultyWithDate(Integer.parseInt(idFaculty), getDateFromString(date));
             ArrayList<UserFinalStatementResult> results = new ArrayList<>();
             //getting final results for users
             for (int i = 0; i < admissionList.size(); i++) {
-                results.add(userDao.getFinalStatementResultForFaculty(admissionList.get(i).getUserId(), faculty.getId(), locale));
+                results.add(userService.getFinalStatementResultForFaculty(admissionList.get(i).getUserId(), faculty.getId(), locale));
             }
             //sort list by total result
             Collections.sort(results, new TotalResultComparator());
@@ -599,13 +601,12 @@ public class AdminActionsController {
 
         String date = (String) request.getSession().getAttribute("date");
 
-        UserDao userDao = new UserDao();
         //find all applied admissions for faculty
-        List<Admission> admissionList = userDao.getAllAppliedUsersAdmissionsForFacultyWithDate(faculty.getId(), getDateFromString(date));
+        List<Admission> admissionList = userService.getAllAppliedUsersAdmissionsForFacultyWithDate(faculty.getId(), getDateFromString(date));
         ArrayList<UserFinalStatementResult> results = new ArrayList<>();
         //getting final results for applied user statements
         for (int i = 0; i < admissionList.size(); i++) {
-            results.add(userDao.getLateFinalStatementResultForFaculty(admissionList.get(i).getUserId(), faculty.getId(), locale));
+            results.add(userService.getFinalStatementResultForFaculty(admissionList.get(i).getUserId(), faculty.getId(), locale));
         }
         //sort list by total result
         Collections.sort(results, new TotalResultComparator());
@@ -638,9 +639,9 @@ public class AdminActionsController {
             String idAdmission = request.getParameter("idAdmission");
             String operation = request.getParameter("operation");
             if (operation.equals("approve")) {
-                facultyDao.approveAdmission(Integer.parseInt(idAdmission));
+                facultyService.approveAdmission(Integer.parseInt(idAdmission));
             } else {
-                facultyDao.disapproveAdmission(Integer.parseInt(idAdmission));
+                facultyService.disapproveAdmission(Integer.parseInt(idAdmission));
             }
 
             String date = (String) request.getSession().getAttribute("date");
@@ -648,11 +649,11 @@ public class AdminActionsController {
             Faculty faculty = (Faculty) request.getSession().getAttribute("facultyStatement");
             //find faculty
             //find all admissions for faculty
-            List<Admission> admissionList = userDao.getAllUsersAdmissionsForFacultyWithDate(faculty.getId(), getDateFromString(date));
+            List<Admission> admissionList = userService.getAllUsersAdmissionsForFacultyWithDate(faculty.getId(), getDateFromString(date));
             ArrayList<UserFinalStatementResult> results = new ArrayList<>();
             //getting final results for users
             for (int i = 0; i < admissionList.size(); i++) {
-                results.add(userDao.getFinalStatementResultForFaculty(admissionList.get(i).getUserId(), faculty.getId(), locale));
+                results.add(userService.getFinalStatementResultForFaculty(admissionList.get(i).getUserId(), faculty.getId(), locale));
             }
             //sort list by total result
             Collections.sort(results, new TotalResultComparator());
@@ -666,7 +667,7 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/delete_statement")
-    public ModelAndView deleteStatement(HttpServletRequest request) {
+    public ModelAndView deleteStatement(HttpServletRequest request) throws IOException {
         ModelAndView modelAndView = new ModelAndView();
 
         //getting locale
@@ -684,8 +685,7 @@ public class AdminActionsController {
             String filename = request.getParameter("name");
 
             //delete file
-            File file = new File(PathApp.STATEMENTS_FOLDER + "/" + filename);
-            file.delete();
+            worker.deleteStatement(PathApp.STATEMENTS_FOLDER + "/" + filename);
             modelAndView.setViewName("app/all_statements");
             return modelAndView;
         }
