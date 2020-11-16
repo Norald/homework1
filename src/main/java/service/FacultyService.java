@@ -4,12 +4,11 @@ import db.dao.FacultyDao;
 import model.Faculty;
 import model.SubjectExam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
-@Service
+@Component
 public class FacultyService {
 
     private FacultyDao facultyDao;

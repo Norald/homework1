@@ -38,5 +38,4 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/start").setViewName("start");
         registry.addViewController("/error").setViewName("error");
     }
-
 }

@@ -3,9 +3,7 @@ package service;
 import db.dao.UserDao;
 import model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
@@ -29,6 +27,7 @@ public class UserService {
     public User findUser(String login, String password) {
         return userDao.findUser(login, password);
     }
+
 
     public User findUser(String email) {
         return userDao.findUser(email);

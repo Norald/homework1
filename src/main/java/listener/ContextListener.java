@@ -6,7 +6,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 /**
- * Context listener. Need for initing log4j
+ * Context listener.
  *
  * @author Vladislav Prokopenko
  */

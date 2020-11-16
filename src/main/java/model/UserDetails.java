@@ -27,14 +27,10 @@ public class UserDetails {
 
     private String schoolName;
 
-    /**
-     * User documents url
-     */
+
     private String documentUrl;
 
-    /**
-     * User certificate point
-     */
+
     private int average_certificate;
 
     public int getUserId() {

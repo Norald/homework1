@@ -36,12 +36,6 @@ public class AccessFilter implements Filter {
 
     }
 
-    /**
-     * Check if access allowed
-     *
-     * @param request
-     * @return true or false
-     */
     private boolean accessAllowed(ServletRequest request) {
         HttpSession session = ((HttpServletRequest) request).getSession();
         String commandName = (String) session.getAttribute("auth");

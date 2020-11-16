@@ -15,13 +15,12 @@ import service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 @Controller
 public class AuthController {
-    private static final Logger LOG = LogManager.getLogger(AuthController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(AuthController.class);
 
 
     private UserService userService;

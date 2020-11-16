@@ -1,14 +1,14 @@
 package pdf;
 
 import org.springframework.stereotype.Component;
-import path.PathApp;
-
 import java.io.*;
+
 
 @Component
 public class StatementWorker {
     public StatementWorker() {
     }
+
 
     public File[] getListOfStatements(String path) {
         File folder = new File(path);

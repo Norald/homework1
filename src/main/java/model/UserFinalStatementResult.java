@@ -15,22 +15,16 @@ public class UserFinalStatementResult {
 
     private long idn;
 
-    /**
-     * Total user exam result;
-     */
+
     private int totalExamResult;
 
 
     private int certificatePoint;
 
-    /**
-     * Is admission approved;
-     */
+
     private boolean isApproved;
 
-    /**
-     * Total result. Sum of totalExamResult and certificate point;
-     */
+
     private int totalResult;
 
 

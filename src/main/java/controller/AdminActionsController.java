@@ -1,7 +1,6 @@
 package controller;
 
-import db.dao.FacultyDao;
-import db.dao.UserDao;
+
 import model.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -24,11 +23,12 @@ import java.util.*;
 
 @Controller
 public class AdminActionsController {
+    private static final Logger LOG = LogManager.getLogger(AdminActionsController.class);
+
     private UserService userService;
     private FacultyService facultyService;
     private CreateStatement statement;
     private StatementWorker worker;
-    private static final Logger LOG = LogManager.getLogger(AdminActionsController.class.getName());
 
 
     @Autowired

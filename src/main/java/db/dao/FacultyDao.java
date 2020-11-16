@@ -5,9 +5,8 @@ import model.SubjectExam;
 import db.DBManager;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,6 +25,13 @@ public class FacultyDao {
 
     private static final Logger LOG = LogManager.getLogger(FacultyDao.class.getName());
 
+    private DBManager dbManager;
+
+    @Autowired
+    public DBManager getDbManager() {
+        return dbManager;
+    }
+
     public FacultyDao() {
     }
 
@@ -38,7 +44,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.SET_ADMISSION_STATUS_DISAPPROVED);
             pstmt.setInt(1, admissionId);
             pstmt.executeUpdate();
@@ -47,7 +53,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -61,7 +67,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.SET_ADMISSION_STATUS_APPROVED);
             pstmt.setInt(1, admissionId);
             pstmt.executeUpdate();
@@ -70,7 +76,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -100,7 +106,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, startValue);
@@ -119,7 +125,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return examsList;
     }
@@ -137,7 +143,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             stmt = con.createStatement();
             rs = stmt.executeQuery(DaoFacultyRequests.GET_TOTAL_COUNT_OF_SUBJECT_EXAMS);
@@ -150,7 +156,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return result;
     }
@@ -167,7 +173,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             stmt = con.createStatement();
             rs = stmt.executeQuery(DaoFacultyRequests.GET_TOTAL_COUNT_OF_FACULTIES);
@@ -180,7 +186,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return result;
     }
@@ -200,7 +206,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_BUDGET_AMOUNT);
             pstmt.setInt(1, startValue);
@@ -217,7 +223,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return facultiesList;
     }
@@ -237,7 +243,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(DaoFacultyRequests.GET_ALL_FACULTIES_LIMIT_ORDER_BY_TOTAL_AMOUNT);
             pstmt.setInt(1, startValue);
@@ -254,7 +260,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return facultiesList;
     }
@@ -280,7 +286,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, startValue);
@@ -297,7 +303,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return facultiesList;
     }
@@ -323,7 +329,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, startValue);
@@ -340,35 +346,11 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return facultiesList;
     }
 
-//    public List<Faculty> getAllFacultiesNoOffset(String locale){
-//        ArrayList<Faculty> facultiesList = new ArrayList<Faculty>();
-//        Statement stmt = null;
-//        ResultSet rs = null;
-//        Connection con = null;
-//        try {
-//            con = DBManager.getInstance().getConnection();
-//            FacultyMapper facultyMapper = new FacultyMapper();
-//            stmt = con.createStatement();
-//            rs = stmt.executeQuery(DaoFacultyRequests.GET_ALL_FACULTIES);
-//            while (rs.next()) {
-//                Faculty faculty = facultyMapper.mapRow(rs, locale);
-//                facultiesList.add(faculty);
-//            }
-//            rs.close();
-//            stmt.close();
-//        } catch (SQLException ex) {
-////            DBManager.getInstance().rollbackAndClose(con);
-//            LOG.error(ex.getMessage(),ex);
-//        } finally {
-//            DBManager.getInstance().commitAndClose(con);
-//        }
-//        return facultiesList;
-//    }
 
     /**
      * Get faculty by id.
@@ -383,7 +365,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(DaoFacultyRequests.GET_FACULTY_BY_ID);
             pstmt.setInt(1, Integer.parseInt(id));
@@ -396,7 +378,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return faculty;
     }
@@ -413,7 +395,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(DaoFacultyRequests.GET_FACULTY_EXAM_DEMENDS_BY_ID);
             pstmt.setInt(1, Integer.parseInt(id));
@@ -428,36 +410,11 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return demendsList;
     }
 
-//    public Set<Integer> getFacultiesByDemends(String idSubjectExam){
-//        Set<Integer> demendsList = new TreeSet<Integer>();
-//        PreparedStatement pstmt = null;
-//        ResultSet rs = null;
-//        Connection con = null;
-//        try {
-//            con = DBManager.getInstance().getConnection();
-//            FacultyMapper facultyMapper = new FacultyMapper();
-//            pstmt = con.prepareStatement(DaoFacultyRequests.GET_FACULTIES_BY_SUBJECT_EXAM_DEMENDS);
-//            pstmt.setInt(1, Integer.parseInt(idSubjectExam));
-//            rs = pstmt.executeQuery();
-//            while (rs.next()) {
-//                int idDemend = rs.getInt("faculty_id");
-//                demendsList.add(idDemend);
-//            }
-//            rs.close();
-//            pstmt.close();
-//        } catch (SQLException ex) {
-////            DBManager.getInstance().rollbackAndClose(con);
-//            LOG.error(ex.getMessage(),ex);
-//        } finally {
-//            DBManager.getInstance().commitAndClose(con);
-//        }
-//        return demendsList;
-//    }
 
     /**
      * Get a list of exams that are required by the faculty
@@ -480,7 +437,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, Integer.parseInt(id));
@@ -498,7 +455,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return examList;
     }
@@ -513,7 +470,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.DELETE_EXAM_DEMENDS);
             pstmt.setInt(1, examId);
             pstmt.setInt(2, facultyId);
@@ -523,7 +480,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -536,7 +493,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.DELETE_ALL_FACULTY_ADMISSION_BY_ID);
             pstmt.setInt(1, facultyId);
             pstmt.executeUpdate();
@@ -545,7 +502,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -574,7 +531,7 @@ public class FacultyDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             FacultyMapper facultyMapper = new FacultyMapper();
             pstmt = con.prepareStatement(DaoFacultyRequests.GET_ALL_SUBJECTS);
             rs = pstmt.executeQuery();
@@ -591,7 +548,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return subjectsList;
     }
@@ -606,7 +563,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.DELETE_FACULTY_BY_ID);
             pstmt.setInt(1, facultyId);
             pstmt.executeUpdate();
@@ -615,7 +572,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -628,7 +585,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.DELETE_FACULTY_EXAM_DEMENDS_BY_FACULTY_ID);
             pstmt.setInt(1, facultyId);
             pstmt.executeUpdate();
@@ -637,7 +594,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -650,7 +607,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.DELETE_SUBJECT_BY_ID);
             pstmt.setInt(1, subjectExamId);
             pstmt.executeUpdate();
@@ -659,7 +616,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -673,7 +630,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.ADD_EXAM_DEMENDS_BY_FACULTY_ID);
             pstmt.setInt(1, idExam);
             pstmt.setInt(2, idFaculty);
@@ -684,7 +641,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -702,7 +659,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.ADD_FACULTY);
             pstmt.setString(1, name);
             pstmt.setInt(2, budget_amount);
@@ -716,7 +673,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -732,7 +689,7 @@ public class FacultyDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.ADD_SUBJECT);
             pstmt.setString(1, name);
             pstmt.setString(2, description);
@@ -744,7 +701,7 @@ public class FacultyDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 

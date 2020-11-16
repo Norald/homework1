@@ -1,6 +1,5 @@
 package model;
 
-import org.springframework.stereotype.Component;
 
 /**
  * Class that describes faculty;

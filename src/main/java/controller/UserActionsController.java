@@ -1,7 +1,5 @@
 package controller;
 
-import db.dao.FacultyDao;
-import db.dao.UserDao;
 import model.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -26,7 +24,7 @@ import java.util.*;
 
 @Controller
 public class UserActionsController {
-    private static final Logger LOG = LogManager.getLogger(UserActionsController.class.getName());
+    private static final Logger LOG = LogManager.getLogger(UserActionsController.class);
 
     private UserService userService;
     private FacultyService facultyService;

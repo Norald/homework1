@@ -2,7 +2,7 @@ package model;
 
 /**
  * Enum that describes user role.
- * Can be USER or ADMIN.
+ * USER/ADMIN.
  *
  * @author Vladislav Prokopenko.
  */

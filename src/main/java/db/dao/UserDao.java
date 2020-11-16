@@ -4,8 +4,8 @@ import db.DBManager;
 import model.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.*;
@@ -19,6 +19,13 @@ import java.util.*;
 @Repository
 public class UserDao {
     private static final Logger LOG = LogManager.getLogger(UserDao.class.getName());
+
+    private DBManager dbManager;
+
+    @Autowired
+    public UserDao(DBManager dbManager) {
+        this.dbManager = dbManager;
+    }
 
     public UserDao() {
 
@@ -35,7 +42,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.ADD_USER);
             pstmt.setString(1, email);
             pstmt.setLong(2, idn);
@@ -47,7 +54,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -73,7 +80,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.ADD_USER_DETAILS);
             pstmt.setInt(1, userId);
             pstmt.setString(2, name);
@@ -95,7 +102,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -138,7 +145,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserMapper mapper = new UserMapper();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, user.getId());
@@ -159,7 +166,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return details;
     }
@@ -189,7 +196,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(request);
             pstmt.setString(1, user.getEmail());
             rs = pstmt.executeQuery();
@@ -204,7 +211,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return mapAdmissionList;
     }
@@ -246,7 +253,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserMapper mapper = new UserMapper();
             pstmt = con.prepareStatement(DaoUserRequest.GET_USER_BY_EMAIL);
             pstmt.setString(1, email);
@@ -259,7 +266,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return user;
     }
@@ -276,7 +283,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserMapper mapper = new UserMapper();
             pstmt = con.prepareStatement(DaoUserRequest.GET_USER_BY_IDN);
             pstmt.setLong(1, Long.parseLong(idn));
@@ -289,7 +296,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return user;
     }
@@ -309,7 +316,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserMapper mapper = new UserMapper();
             pstmt = con.prepareStatement(DaoUserRequest.GET_USER_BY_EMAIL_AND_PASSWORD);
             pstmt.setString(1, email);
@@ -325,7 +332,7 @@ public class UserDao {
             LOG.error(ex.getMessage(), ex);
         } finally {
             if (con != null) {
-                DBManager.getInstance().commitAndClose(con);
+                dbManager.commitAndClose(con);
             }
         }
         return user;
@@ -344,7 +351,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.GET_ALL_USER_SUBJECTS_BY_EMAIL);
             pstmt.setString(1, email);
             rs = pstmt.executeQuery();
@@ -358,7 +365,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return userSubjects;
     }
@@ -379,7 +386,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserResultMapper mapper = new UserResultMapper();
             pstmt = con.prepareStatement(DaoUserRequest.GET_ALL_USER_MARKS_BY_EMAIL);
             pstmt.setString(1, email);
@@ -394,7 +401,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return resultList;
     }
@@ -424,7 +431,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserMapper mapper = new UserMapper();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, id);
@@ -440,7 +447,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return subjectExam;
     }
@@ -457,7 +464,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.INSERT_NEW_USER_MARK);
             pstmt.setInt(1, userId);
             pstmt.setInt(2, idSubjectExam);
@@ -469,7 +476,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -484,7 +491,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoFacultyRequests.ADD_USER_ADMISSION);
             pstmt.setInt(1, userId);
             pstmt.setInt(2, faculty_id);
@@ -496,7 +503,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -513,7 +520,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             AdmissionMapper admissionMapper = new AdmissionMapper();
             pstmt = con.prepareStatement(DaoUserRequest.SELECT_USER_ADMISSIONS_FOR_FACULTY);
             pstmt.setInt(1, user_id);
@@ -529,7 +536,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return userAdmission;
     }
@@ -544,7 +551,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.DELETE_ALL_USER_MARKS);
             pstmt.setInt(1, userId);
             pstmt.setInt(2, idSubjectExam);
@@ -554,7 +561,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -567,7 +574,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.DELETE_ALL_USER_ADMISSION);
             pstmt.setInt(1, userId);
             pstmt.executeUpdate();
@@ -576,7 +583,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -593,7 +600,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.UPDATE_USER_BY_ID);
             pstmt.setString(1, email);
             pstmt.setLong(2, idn);
@@ -606,7 +613,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -632,7 +639,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.UPDATE_USER_DETAILS_BY_ID);
             pstmt.setString(1, name);
             pstmt.setString(2, surname);
@@ -656,7 +663,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -681,7 +688,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, userId);
             pstmt.setString(2, faculty_name);
@@ -691,7 +698,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -708,7 +715,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserMapper mapper = new UserMapper();
             pstmt = con.prepareStatement(DaoUserRequest.GET_ALL_USERS_WITH_LIMIT);
             pstmt.setInt(1, startValue);
@@ -724,7 +731,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return userList;
     }
@@ -741,7 +748,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             stmt = con.createStatement();
             rs = stmt.executeQuery(DaoUserRequest.GET_TOTAL_COUNT_OF_USERS);
             if (rs.next()) {
@@ -753,7 +760,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return result;
     }
@@ -768,7 +775,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.BLOCK_USER_BY_ID);
             pstmt.setInt(1, userId);
             pstmt.executeUpdate();
@@ -777,7 +784,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -790,7 +797,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.UNBLOCK_USER_BY_ID);
             pstmt.setInt(1, userId);
             pstmt.executeUpdate();
@@ -799,7 +806,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -813,7 +820,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.SET_TO_USER_ADMIN_ROLE_BY_ID);
             pstmt.setInt(1, userId);
             pstmt.executeUpdate();
@@ -822,7 +829,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -835,7 +842,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.SET_TO_USER_USER_ROLE_BY_ID);
             pstmt.setInt(1, userId);
             pstmt.executeUpdate();
@@ -844,7 +851,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -857,7 +864,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             pstmt = con.prepareStatement(DaoUserRequest.DELETE_ALL_USER_RESULS_BY_SUBJECT_EXAM_ID);
             pstmt.setInt(1, subjectExamId);
             pstmt.executeUpdate();
@@ -866,7 +873,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
     }
 
@@ -883,7 +890,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             AdmissionMapper admissionMapper = new AdmissionMapper();
             pstmt = con.prepareStatement(DaoUserRequest.SELECT_ALL_USERS_ADMISSIONS_FOR_FACULTY);
             pstmt.setInt(1, faculty_id);
@@ -901,7 +908,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return userAdmission;
     }
@@ -919,7 +926,7 @@ public class UserDao {
         ResultSet rs = null;
         Connection con = null;
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             AdmissionMapper admissionMapper = new AdmissionMapper();
             pstmt = con.prepareStatement(DaoUserRequest.SELECT_ALL_APPLIED_USERS_ADMISSIONS_FOR_FACULTY);
             pstmt.setInt(1, faculty_id);
@@ -937,7 +944,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return userAdmission;
     }
@@ -964,7 +971,7 @@ public class UserDao {
             request = DaoUserRequest.GET_USER_ADMISSION_RESULTS_BY_ID_FACULTY_ID_APPROVED;
         }
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserMapper mapper = new UserMapper();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, userId);
@@ -992,7 +999,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return userFinalStatementResults;
     }
@@ -1019,7 +1026,7 @@ public class UserDao {
             request = DaoUserRequest.GET_USER_ADMISSION_RESULTS_BY_ID_FACULTY_ID;
         }
         try {
-            con = DBManager.getInstance().getConnection();
+            con = dbManager.getConnection();
             UserMapper mapper = new UserMapper();
             pstmt = con.prepareStatement(request);
             pstmt.setInt(1, userId);
@@ -1047,7 +1054,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            DBManager.getInstance().commitAndClose(con);
+            dbManager.commitAndClose(con);
         }
         return userFinalStatementResults;
     }

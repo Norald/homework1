@@ -9,20 +9,13 @@ public class User {
 
     private int id;
 
-
     private String email;
 
-    /**
-     * Identification number of user;
-     */
     private long idn;
-
 
     private boolean blocked;
 
-
     private int userRoleId;
-
 
     private String password;
 
