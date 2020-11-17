@@ -1,5 +1,6 @@
 package controller;
 
+import exception.*;
 import model.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -38,7 +39,7 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/faculties")
-    public ModelAndView showListOfFaculties(HttpServletRequest request) {
+    public ModelAndView showListOfFaculties(HttpServletRequest request) throws CantGetFacultiesException {
         ModelAndView modelAndView = new ModelAndView();
 
         String sort;
@@ -105,15 +106,12 @@ public class UserActionsController {
             modelAndView.setViewName("app/faculties");
             return modelAndView;
         } else {
-            LOG.warn("Can`t get faculties");
-            request.setAttribute("error", rb.getString("error.cant.get.faculties"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new CantGetFacultiesException();
         }
     }
 
     @RequestMapping(value = "/app/add_mark")
-    public ModelAndView addMark(HttpServletRequest request) {
+    public ModelAndView addMark(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
 
         //getting locale
@@ -132,15 +130,9 @@ public class UserActionsController {
             //adding mark for user
             userService.addUserMark(user.getId(), Integer.parseInt(examId), Integer.parseInt(mark));
             modelAndView.setViewName("redirect:/app/marks");
-//            response.sendRedirect("/app/marks");
             return modelAndView;
-
-
         } else {
-            LOG.warn("Empty parameters");
-            request.setAttribute("error", rb.getString("error.registration.empty.parameters"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         }
     }
 
@@ -171,7 +163,7 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/mark_del")
-    public ModelAndView deleteMark(HttpServletRequest request) {
+    public ModelAndView deleteMark(HttpServletRequest request) throws WrongIdOfSubjectExamException {
         ModelAndView modelAndView = new ModelAndView();
 
         String userid = request.getParameter("subjectid");
@@ -183,10 +175,7 @@ public class UserActionsController {
 
         //check if empty
         if (userid.isEmpty() || userid.equals("")) {
-            LOG.warn("Wrong id or subject exam");
-            request.setAttribute("error", rb.getString("error.wrong.id.or.subject.exam"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new WrongIdOfSubjectExamException();
         } else {
             String userEmail = (String) request.getSession().getAttribute("email");
             User user = userService.findUser(userEmail);
@@ -224,7 +213,7 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/admission_del")
-    public ModelAndView deleteAdmission(HttpServletRequest request) {
+    public ModelAndView deleteAdmission(HttpServletRequest request) throws WrongFacultyException {
         ModelAndView modelAndView = new ModelAndView();
         String faculty_Name = request.getParameter("faculty_name");
         //getting locale
@@ -246,15 +235,12 @@ public class UserActionsController {
             modelAndView.setViewName("redirect:/app/admissions");
             return modelAndView;
         } else {
-            LOG.warn("Wrong faculty");
-            request.setAttribute("error", rb.getString("error.wrong.faculty"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new WrongFacultyException();
         }
     }
 
     @RequestMapping(value = "/app/faculty")
-    public ModelAndView facultyAdmission(HttpServletRequest request) {
+    public ModelAndView facultyAdmission(HttpServletRequest request) throws WrongIdOfFacultyException, NoSuchFacultyException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -263,17 +249,11 @@ public class UserActionsController {
 
         String id = request.getParameter("id");
         if (id.isEmpty() || id.equals("")) {
-            LOG.warn("Wrong id faculty");
-            request.setAttribute("error", rb.getString("error.wrong.id.of.faculty"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new WrongIdOfFacultyException();
         } else {
             Faculty faculty = facultyService.findFacultyById(id, locale);
             if (faculty == null) {
-                LOG.warn("No such faculty");
-                request.setAttribute("error", rb.getString("error.no.such.faculty"));
-                modelAndView.setViewName("error");
-                return modelAndView;
+                throw new NoSuchFacultyException();
             } else {
                 Set<Integer> facultyDemends = facultyService.getFacultyDemends(id);
 
@@ -297,7 +277,7 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/participate")
-    public ModelAndView sendAdmission(HttpServletRequest request) {
+    public ModelAndView sendAdmission(HttpServletRequest request) throws EmptyFacultyIdException, FacultyHaveNoDemendsException, AlreadySendedAmdissionException {
         ModelAndView modelAndView = new ModelAndView();
         String faculty_id = request.getParameter("faculty_id");
         String locale = (String) request.getSession().getAttribute("language");
@@ -307,10 +287,7 @@ public class UserActionsController {
 
         //checking if values are empty
         if (faculty_id.equals("") || faculty_id.isEmpty()) {
-            LOG.warn("faculty_id is empty");
-            request.setAttribute("error", "faculty_id is empty");
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyFacultyIdException();
         } else {
 
             User user = userService.findUser((String) request.getSession().getAttribute("email"));
@@ -321,11 +298,7 @@ public class UserActionsController {
 
             //If faculty have no demends, user can`t apply
             if (list.size() < 3) {
-                LOG.warn("Faculty have no demends");
-                request.setAttribute("error", rb.getString("error.cant.apply"));
-                modelAndView.setViewName("error");
-                return modelAndView;
-
+                throw new FacultyHaveNoDemendsException();
             } else if (listAdmission.isEmpty()) {
 
                 userService.addUserAdmissionToFaculty(user.getId(), Integer.parseInt(faculty_id));
@@ -337,16 +310,13 @@ public class UserActionsController {
                 return modelAndView;
 
             } else {//if user already send admission
-                LOG.warn(request.getSession().getAttribute("email") + " Already send admission");
-                request.setAttribute("error", rb.getString("error.already.send.admission"));
-                modelAndView.setViewName("error");
-                return modelAndView;
+                throw new AlreadySendedAmdissionException();
             }
         }
     }
 
     @RequestMapping(value = "/app/personalInfo")
-    public ModelAndView showPersonalInfo(HttpServletRequest request) {
+    public ModelAndView showPersonalInfo(HttpServletRequest request) throws NoSuchUserException {
         ModelAndView modelAndView = new ModelAndView();
 
 
@@ -370,15 +340,12 @@ public class UserActionsController {
             modelAndView.setViewName("app/info");
             return modelAndView;
         } else {
-            LOG.warn("No such user");
-            request.setAttribute("error", rb.getString("error.there.are.not.such.user"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new NoSuchUserException();
         }
     }
 
     @RequestMapping(value = "/app/changeinfo")
-    public ModelAndView changePersonalInfo(HttpServletRequest request) {
+    public ModelAndView changePersonalInfo(HttpServletRequest request) throws EmptyParametersException, SuchEmailExistException, SuchIdnExistException {
         ModelAndView modelAndView = new ModelAndView();
 
 
@@ -406,16 +373,13 @@ public class UserActionsController {
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
 
-        //check if empty
         if (email.isEmpty() || pass1.isEmpty() || idn.isEmpty() ||
                 name.isEmpty() || surname.isEmpty() || patronymic.isEmpty() || city.isEmpty() ||
                 region.isEmpty() || school_name.isEmpty() || average_certificate_point.isEmpty() || name_ua.isEmpty() ||
                 surname_ua.isEmpty() || patronymic_ua.isEmpty() || city_ua.isEmpty() || region_ua.isEmpty() ||
                 school_name_ua.isEmpty()) {
-            LOG.warn("Empty parameters");
-            request.setAttribute("error", rb.getString("error.registration.empty.parameters"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+
+            throw new EmptyParametersException();
         } else {
             //find user by email, show us if such email exists
             User user = userService.findUser(email);
@@ -425,19 +389,13 @@ public class UserActionsController {
 
             //if email exists
             if (user != null && !user.getEmail().equals(sessionUser.getEmail())) {
-                LOG.warn("Email already exists");
-                request.setAttribute("error", rb.getString("error.such.email.exists"));
-                modelAndView.setViewName("error");
-                return modelAndView;
+                throw new SuchEmailExistException();
             }
             user = userService.findUserByIdn(idn);
 
             //if identification number exists
             if (user != null && user.getIdn() != sessionUser.getIdn()) {
-                LOG.warn("IDN already exists");
-                request.setAttribute("error", rb.getString("error.such.idn.exists"));
-                modelAndView.setViewName("error");
-                return modelAndView;
+                throw new SuchIdnExistException();
             } else {
 
 

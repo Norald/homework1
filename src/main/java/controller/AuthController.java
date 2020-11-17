@@ -1,5 +1,6 @@
 package controller;
 
+import exception.*;
 import model.User;
 import model.UserRole;
 import org.apache.log4j.LogManager;
@@ -39,7 +40,7 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/login")
-    public ModelAndView login(HttpServletRequest request) {
+    public ModelAndView login(HttpServletRequest request) throws UserBlockedException, WrongEmailOrPasswordException {
 
         String login = request.getParameter("login");
         String password = request.getParameter("pass");
@@ -52,7 +53,6 @@ public class AuthController {
         ResourceBundle rb = ResourceBundle.getBundle("resource", current);
 
         //get user and check if exists
-        //UserDao userDao = new UserDao();
         User user;
 
         user = userService.findUser(login, password);
@@ -62,11 +62,7 @@ public class AuthController {
 
             //check if user blocked
             if (user.isBlocked()) {
-                LOG.warn(login + " is blocked. Can`t login");
-
-                ModelAndView modelAndView = new ModelAndView();
-                modelAndView.setViewName("error");
-                return modelAndView;
+                throw new UserBlockedException();
 
             } else {
 
@@ -86,19 +82,15 @@ public class AuthController {
 
                 return modelAndView;
             }
-        } else {//if wrong email or password
-            LOG.warn(login + " wrong email or password");
-            request.setAttribute("error", rb.getString("error.wrong.email.or.password"));
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("error");
-            return modelAndView;
+        } else {
+            throw new WrongEmailOrPasswordException();
         }
 
     }
 
 
     @RequestMapping(value = "/changeLang")
-    public ModelAndView changeLanguage(HttpServletRequest request) {
+    public ModelAndView changeLanguage(HttpServletRequest request) throws EmptyLanguageException {
 
         String language = request.getParameter("lang");
 
@@ -106,19 +98,14 @@ public class AuthController {
             LOG.info("Changing language");
             request.getSession().removeAttribute("language");
             request.getSession().setAttribute("language", language);
-
             return new ModelAndView("redirect:" + request.getHeader("referer"));
         } else {
-            LOG.warn("Language empty");
-            request.setAttribute("error", "error");
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyLanguageException();
         }
     }
 
     @PostMapping(value = "/doRegistration")
-    public ModelAndView registration(HttpServletRequest request) {
+    public ModelAndView registration(HttpServletRequest request) throws EmptyParametersException, SuchEmailExistException, SuchIdnExistException, PasswordDontMatchException {
         ModelAndView modelAndView = new ModelAndView();
         String email = request.getParameter("email");
         String pass1 = request.getParameter("pass1");
@@ -148,32 +135,19 @@ public class AuthController {
                 english_region.isEmpty() || english_school_name.isEmpty() || average_certificate_point.isEmpty() || ukrainian_name.isEmpty() ||
                 ukrainian_surname.isEmpty() || ukrainian_patronymic.isEmpty() || ukrainian_city.isEmpty() || ukrainian_region.isEmpty() ||
                 ukrainian_school_name.isEmpty()) {
-
-            LOG.warn("Empty parameters in registration");
-            request.setAttribute("error", rb.getString("error.registration.empty.parameters"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             User user = userService.findUser(email);
             //check if email already exists
             if (user != null) {
-                LOG.warn("Such email exists");
-                request.setAttribute("error", rb.getString("error.such.email.exists"));
-                modelAndView.setViewName("error");
-                return modelAndView;
+                throw new SuchEmailExistException();
             }
             user = userService.findUserByIdn(idn);
             //check if identification number already exists
             if (user != null) {
-                LOG.warn("Such idn exists");
-                request.setAttribute("error", rb.getString("error.such.idn.exists"));
-                modelAndView.setViewName("error");
-                return modelAndView;
+                throw new SuchIdnExistException();
             } else if (!pass1.equals(pass2)) { //check if passwords match
-                LOG.warn("Passwords dont match");
-                request.setAttribute("error", rb.getString("error.passwords.should.match"));
-                modelAndView.setViewName("error");
-                return modelAndView;
+                throw new PasswordDontMatchException();
             } else {
                 LOG.info("Registration with email is successfull " + email);
                 userService.addUser(email, Long.parseLong(idn), pass1);

@@ -1,6 +1,7 @@
 package controller;
 
 
+import exception.*;
 import model.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -48,7 +49,7 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/all_faculties")
-    public ModelAndView showAllFacultiesAdmin(HttpServletRequest request) {
+    public ModelAndView showAllFacultiesAdmin(HttpServletRequest request) throws CantGetFacultiesException {
         ModelAndView modelAndView = new ModelAndView();
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
@@ -87,15 +88,12 @@ public class AdminActionsController {
             modelAndView.setViewName("app/admin/all_faculties");
             return modelAndView;
         } else {
-            LOG.warn("Cant get faculties");
-            request.setAttribute("error", rb.getString("error.cant.get.faculties"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new CantGetFacultiesException();
         }
     }
 
     @RequestMapping(value = "/app/admin/add_faculty")
-    public ModelAndView addFaculty(HttpServletRequest request) {
+    public ModelAndView addFaculty(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -104,10 +102,7 @@ public class AdminActionsController {
         if (request.getParameter("name") == null || request.getParameter("name_ua") == null ||
                 request.getParameter("description") == null || request.getParameter("description_ua") == null ||
                 request.getParameter("budget_amount") == null || request.getParameter("total_amount") == null) {
-            LOG.warn("Empty parameter");
-            request.setAttribute("error", rb.getString("error.empty.parameter"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             String name = request.getParameter("name");
             String name_ua = request.getParameter("name_ua");
@@ -123,16 +118,13 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/delete_faculty")
-    public ModelAndView deleteFaculty(HttpServletRequest request) {
+    public ModelAndView deleteFaculty(HttpServletRequest request) throws EmptyFacultyIdException {
         ModelAndView modelAndView = new ModelAndView();
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
         if (request.getParameter("id") == null) {
-            LOG.warn("Empty id");
-            request.setAttribute("error", rb.getString("error.empty.id"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyFacultyIdException();
         } else {
             String id = request.getParameter("id");
             //DELETE ALL ADMISSIONS AND DEMENDS IF FACULTY DELETED!
@@ -145,7 +137,7 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/subject_exams")
-    public ModelAndView showListOfSubjects(HttpServletRequest request) {
+    public ModelAndView showListOfSubjects(HttpServletRequest request) throws CantGetSubjectExamException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -184,15 +176,12 @@ public class AdminActionsController {
             modelAndView.setViewName("app/admin/subject_exams");
             return modelAndView;
         } else {
-            LOG.warn("Cant get subject exam");
-            request.setAttribute("error", rb.getString("error.cant.get.subject.exam"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new CantGetSubjectExamException();
         }
     }
 
     @RequestMapping(value = "/app/admin/add_subject_exam")
-    public ModelAndView addSubject(HttpServletRequest request) {
+    public ModelAndView addSubject(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -200,10 +189,7 @@ public class AdminActionsController {
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
         if (request.getParameter("name") == null || request.getParameter("name_ua") == null ||
                 request.getParameter("description") == null || request.getParameter("description_ua") == null) {
-            LOG.warn("Empty parameter");
-            request.setAttribute("error", rb.getString("error.empty.parameter"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             String name = request.getParameter("name");
             String name_ua = request.getParameter("name_ua");
@@ -217,16 +203,13 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/delete_subject_exam")
-    public ModelAndView deleteSubject(HttpServletRequest request) {
+    public ModelAndView deleteSubject(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
         if (request.getParameter("id") == null) {
-            LOG.warn("Empty id");
-            request.setAttribute("error", rb.getString("error.empty.id"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             String id = request.getParameter("id");
             //DELETE admissions if subject exam deleted
@@ -242,7 +225,7 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/users")
-    public ModelAndView showAllUsers(HttpServletRequest request) {
+    public ModelAndView showAllUsers(HttpServletRequest request) throws CantGetUsersException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -282,25 +265,19 @@ public class AdminActionsController {
             modelAndView.setViewName("app/admin/all_users");
             return modelAndView;
         } else {
-            LOG.warn("Cant get faculties");
-            request.setAttribute("error", rb.getString("error.cant.get.users"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new CantGetUsersException();
         }
     }
 
     @RequestMapping(value = "/app/admin/block_user")
-    public ModelAndView blockUser(HttpServletRequest request) {
+    public ModelAndView blockUser(HttpServletRequest request) throws EmptyParametersException, WrongOperationException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
         if (request.getParameter("operation") == null || request.getParameter("id") == null) {
-            LOG.warn("Error operation or user id null");
-            request.setAttribute("error", rb.getString("error.operation.or.user.id.null"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else if (request.getParameter("operation").equals("block") || request.getParameter("operation").equals("unblock")) {
             String operation = request.getParameter("operation");
             String userId = request.getParameter("id");
@@ -316,15 +293,12 @@ public class AdminActionsController {
                 return modelAndView;
             }
         } else {
-            LOG.warn("Wrong operation");
-            request.setAttribute("error", "Wrong operation");
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new WrongOperationException();
         }
     }
 
     @RequestMapping(value = "/app/admin/user_set_role")
-    public ModelAndView changeUserRole(HttpServletRequest request) {
+    public ModelAndView changeUserRole(HttpServletRequest request) throws EmptyParametersException, WrongOperationException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -332,10 +306,7 @@ public class AdminActionsController {
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
         //check if parameters not null
         if (request.getParameter("operation") == null || request.getParameter("id") == null) {
-            LOG.warn("Error operation or user id null");
-            request.setAttribute("error", rb.getString("error.operation.or.user.id.null"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else if (request.getParameter("operation").equals("makeUser") || request.getParameter("operation").equals("makeAdmin")) {
             String operation = request.getParameter("operation");
             String userId = request.getParameter("id");
@@ -351,15 +322,12 @@ public class AdminActionsController {
                 return modelAndView;
             }
         } else {
-            LOG.warn("Wrong operation");
-            request.setAttribute("error", rb.getString("error.wrong.operation"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new WrongOperationException();
         }
     }
 
     @RequestMapping(value = "/app/admin/faculty_admissions")
-    public ModelAndView facultyDemends(HttpServletRequest request) {
+    public ModelAndView facultyDemends(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -387,15 +355,12 @@ public class AdminActionsController {
             modelAndView.setViewName("app/admin/faculty_demends");
             return modelAndView;
         } else {
-            LOG.warn("Empty id");
-            request.setAttribute("error", rb.getString("error.empty.id"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         }
     }
 
     @RequestMapping(value = "/app/admin/faculty_demend")
-    public ModelAndView addFacultyDemend(HttpServletRequest request) {
+    public ModelAndView addFacultyDemend(HttpServletRequest request) throws EmptyParametersException {
 
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
@@ -404,10 +369,7 @@ public class AdminActionsController {
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
         if (request.getParameter("idFaculty") == null && request.getParameter("idFaculty") == null) {
-            LOG.warn("Empty faculty id or exam id");
-            request.setAttribute("error", rb.getString("error.empty.faculty.or.exam.id"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             String examId = request.getParameter("demendSelect");
             String facultyId = request.getParameter("idFaculty");
@@ -427,7 +389,7 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/delete_demend")
-    public ModelAndView deleteFacultyDemend(HttpServletRequest request) {
+    public ModelAndView deleteFacultyDemend(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
@@ -436,10 +398,7 @@ public class AdminActionsController {
 
 
         if (request.getParameter("idFaculty") == null || request.getParameter("idExam") == null) {
-            LOG.warn("Empty faculty id or exam id");
-            request.setAttribute("error", rb.getString("error.empty.faculty.or.exam.id"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             String idFaculty = request.getParameter("idFaculty");
             String idExam = request.getParameter("idExam");
@@ -464,7 +423,7 @@ public class AdminActionsController {
 
 
     @RequestMapping(value = "/app/admin/generation_statements")
-    public ModelAndView showListOfFacultiesStatements(HttpServletRequest request) {
+    public ModelAndView showListOfFacultiesStatements(HttpServletRequest request) throws CantGetFacultiesException {
         ModelAndView modelAndView = new ModelAndView();
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
@@ -502,15 +461,12 @@ public class AdminActionsController {
             modelAndView.setViewName("app/admin/faculties_list_statements");
             return modelAndView;
         } else {
-            LOG.warn("Cant get faculties");
-            request.setAttribute("error", rb.getString("error.cant.get.faculties"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new CantGetFacultiesException();
         }
     }
 
     @RequestMapping(value = "/app/admin/generate_statement")
-    public ModelAndView generatePageStatement(HttpServletRequest request) {
+    public ModelAndView generatePageStatement(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
 
         //getting locale
@@ -519,10 +475,7 @@ public class AdminActionsController {
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
         if (request.getParameter("id") == null || request.getParameter("date") == null) {
-            LOG.warn("Error id or date null");
-            request.setAttribute("error", rb.getString("error.id.or.date.null"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             String idFaculty = request.getParameter("id");
             String date = request.getParameter("date");
@@ -623,7 +576,7 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/confirm_user_for_statement")
-    public ModelAndView confirmUserForStatement(HttpServletRequest request) {
+    public ModelAndView confirmUserForStatement(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
 
         //getting locale
@@ -631,10 +584,7 @@ public class AdminActionsController {
         //getting locale for errors
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
         if (request.getParameter("idAdmission") == null || request.getParameter("operation") == null) {
-            LOG.warn("Empty value");
-            request.setAttribute("error", rb.getString("error.empty.parameter"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             String idAdmission = request.getParameter("idAdmission");
             String operation = request.getParameter("operation");
@@ -667,7 +617,7 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/delete_statement")
-    public ModelAndView deleteStatement(HttpServletRequest request) throws IOException {
+    public ModelAndView deleteStatement(HttpServletRequest request) throws IOException, EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
 
         //getting locale
@@ -676,10 +626,7 @@ public class AdminActionsController {
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
         if (request.getParameter("name") == null) {
-            LOG.warn("Empty parameter");
-            request.setAttribute("error", rb.getString("error.empty.parameter"));
-            modelAndView.setViewName("error");
-            return modelAndView;
+            throw new EmptyParametersException();
         } else {
             //get name from request
             String filename = request.getParameter("name");
