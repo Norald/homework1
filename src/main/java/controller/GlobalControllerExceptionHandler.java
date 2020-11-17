@@ -20,18 +20,6 @@ public class GlobalControllerExceptionHandler {
     private static final Logger LOG = LogManager.getLogger(GlobalControllerExceptionHandler.class);
 
 
-    /**
-     * 404 error
-     */
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ModelAndView default404ErrorHandler(HttpServletRequest request) {
-        request.setAttribute("error", "404. No such resource.");
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("error");
-        return mav;
-    }
-
     @ExceptionHandler(UserBlockedException.class)
     public ModelAndView blockUserHandler(HttpServletRequest request) {
         LOG.warn("Blocked. Can`t login");
@@ -216,6 +204,18 @@ public class GlobalControllerExceptionHandler {
         request.setAttribute("error", "Wrong operation");
         modelAndView.setViewName("error");
         return modelAndView;
+    }
+
+    /**
+     * 404 error
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ModelAndView default404ErrorHandler(HttpServletRequest request) {
+        request.setAttribute("error", "404. No such resource.");
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("error");
+        return mav;
     }
 
     @ExceptionHandler(Throwable.class)

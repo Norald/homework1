@@ -104,7 +104,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping(value = "/doRegistration")
+    @RequestMapping(value = "/doRegistration")
     public ModelAndView registration(HttpServletRequest request) throws EmptyParametersException, SuchEmailExistException, SuchIdnExistException, PasswordDontMatchException {
         ModelAndView modelAndView = new ModelAndView();
         String email = request.getParameter("email");
