@@ -2,6 +2,7 @@ package db;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.naming.Context;
@@ -17,7 +18,7 @@ import java.sql.SQLException;
  * @author Prokopenko Vladislav
  * @since 25.09.2020
  */
-@Service
+@Repository
 public class DBManager {
     private static final Logger LOG = LogManager.getLogger(DBManager.class.getName());
 

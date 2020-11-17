@@ -28,8 +28,8 @@ public class FacultyDao {
     private DBManager dbManager;
 
     @Autowired
-    public DBManager getDbManager() {
-        return dbManager;
+    public FacultyDao(DBManager dbManager) {
+        this.dbManager = dbManager;
     }
 
     public FacultyDao() {
