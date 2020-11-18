@@ -1,4 +1,4 @@
 package exception;
 
-public class EmptyParametersException extends Exception{
+public class EmptyParametersException extends RuntimeException{
 }

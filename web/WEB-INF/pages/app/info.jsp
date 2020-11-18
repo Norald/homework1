@@ -80,7 +80,7 @@
                         <div class="form-group">
                             <label for="certificate_point" class="text-info"><fmt:message
                                     key="info.average.certificate.point"/></label><br>
-                            <input id="certificate_point" type="number" value="${details2.averageСertificate}"
+                            <input id="certificate_point" type="number" value="${details2.averageCertificate}"
                                    name="average_certificate_point" required="required" pattern="[0-9]{3}"
                                    class="form-control">
                         </div>

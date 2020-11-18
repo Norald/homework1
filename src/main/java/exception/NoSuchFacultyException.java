@@ -1,4 +1,4 @@
 package exception;
 
-public class NoSuchFacultyException extends Exception {
+public class NoSuchFacultyException extends RuntimeException {
 }

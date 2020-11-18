@@ -22,8 +22,6 @@ import java.sql.SQLException;
 public class DBManager {
     private static final Logger LOG = LogManager.getLogger(DBManager.class.getName());
 
-    private static DBManager instance;
-
 
     public DBManager() {
     }

@@ -1,4 +1,4 @@
 package exception;
 
-public class SuchEmailExistException extends Exception{
+public class SuchEmailExistException extends RuntimeException{
 }

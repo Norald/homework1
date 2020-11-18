@@ -1,4 +1,4 @@
 package exception;
 
-public class CantGetSubjectExamException extends Exception {
+public class CantGetSubjectExamException extends RuntimeException {
 }

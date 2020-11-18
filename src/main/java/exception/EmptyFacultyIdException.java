@@ -1,4 +1,4 @@
 package exception;
 
-public class EmptyFacultyIdException extends Exception {
+public class EmptyFacultyIdException extends RuntimeException {
 }

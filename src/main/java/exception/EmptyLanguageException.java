@@ -1,4 +1,4 @@
 package exception;
 
-public class EmptyLanguageException extends Exception {
+public class EmptyLanguageException extends RuntimeException {
 }

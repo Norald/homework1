@@ -72,7 +72,6 @@ public class UserActionsController {
             startValue = (pageFaculty - 1) * facultyCountOnPage;
         }
 
-//        FacultyDao facultyDao = new FacultyDao();
         int rows = facultyService.getCountOfFaculties();
 
         int nOfPages = rows / facultyCountOnPage;
@@ -85,77 +84,35 @@ public class UserActionsController {
             nOfPages--;
         }
 
-        List<Faculty> faculties = null;
-        if (sort.equals("sortAZ")) {
-            faculties = facultyService.getFacultiesWithLimitOrderAZ(startValue, facultyCountOnPage, locale);
-        } else if (sort.equals("sortZA")) {
-            faculties = facultyService.getFacultiesWithLimitOrderZA(startValue, facultyCountOnPage, locale);
-        } else if (sort.equals("sortBudget")) {
-            faculties = facultyService.getFacultiesWithLimitOrderBugdet(startValue, facultyCountOnPage, locale);
-        } else {
-            faculties = facultyService.getFacultiesWithLimitOrderTotal(startValue, facultyCountOnPage, locale);
-        }
-        if (!faculties.isEmpty()) {
-            LOG.info("Getting faculties successful");
-            request.setAttribute("facultiesList", faculties);
-            request.setAttribute("noOfPages", nOfPages);
-            request.setAttribute("pageFaculty", pageFaculty);
-            //update sort attribute in session
-            request.getSession().removeAttribute("sort");
-            request.getSession().setAttribute("sort", sort);
-            modelAndView.setViewName("app/faculties");
-            return modelAndView;
-        } else {
-            throw new CantGetFacultiesException();
-        }
+        List<Faculty> faculties = facultyService.getFacultiesWithSorting(sort, startValue, facultyCountOnPage, locale);
+        LOG.info("Getting faculties successful");
+        request.setAttribute("facultiesList", faculties);
+        request.setAttribute("noOfPages", nOfPages);
+        request.setAttribute("pageFaculty", pageFaculty);
+        //update sort attribute in session
+        request.getSession().removeAttribute("sort");
+        request.getSession().setAttribute("sort", sort);
+        modelAndView.setViewName("app/faculties");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/app/add_mark")
     public ModelAndView addMark(HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
-
-        //getting locale
-        String locale = (String) request.getSession().getAttribute("language");
-        //getting locale for errors
-        ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
-        if (request.getParameter("mark") != null || request.getParameter("marksSelect") != null) {
-            String mark = request.getParameter("mark");
-            String examId = request.getParameter("marksSelect");
-            String userEmail = (String) request.getSession().getAttribute("email");
-
-
-            //find user
-            User user = userService.findUser(userEmail);
-
-            //adding mark for user
-            userService.addUserMark(user.getId(), Integer.parseInt(examId), Integer.parseInt(mark));
-            modelAndView.setViewName("redirect:/app/marks");
-            return modelAndView;
-        } else {
-            throw new EmptyParametersException();
-        }
+        userService.addUserMark(request);
+        modelAndView.setViewName("redirect:/app/marks");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/app/marks")
     public ModelAndView showListOfMarks(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView();
-
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
-
+        LOG.info(request.getSession().getAttribute("email"));
         //getting user exams
         List<UserResult> results = userService.findUserResults((String) request.getSession().getAttribute("email"), locale);
-        //getting all exams
-        List<SubjectExam> exams = facultyService.getAllSubjectExamsForFaculty(locale);
-
-
-        //we delete the user's choice so that he cannot re-select the same subject for which he has already contributed points
-        List<SubjectExam> usersExams = new ArrayList<SubjectExam>();
-        for (int i = 0; i < results.size(); i++) {
-            usersExams.add(results.get(i).getSubjectExam());
-        }
-        exams.removeAll(usersExams);
-
+        List<SubjectExam> exams = facultyService.getUserAvailableSubjects(request, locale, results);
         request.setAttribute("results", results);
         request.setAttribute("exams", exams);
         modelAndView.setViewName("app/marks");
@@ -165,49 +122,23 @@ public class UserActionsController {
     @RequestMapping(value = "/app/mark_del")
     public ModelAndView deleteMark(HttpServletRequest request) throws WrongIdOfSubjectExamException {
         ModelAndView modelAndView = new ModelAndView();
-
-        String userid = request.getParameter("subjectid");
-        String locale = (String) request.getSession().getAttribute("language");
-        //getting locale for errors
-        Locale current = new Locale(locale);
-        //getting resource bundle
-        ResourceBundle rb = ResourceBundle.getBundle("resource", current);
-
-        //check if empty
-        if (userid.isEmpty() || userid.equals("")) {
-            throw new WrongIdOfSubjectExamException();
-        } else {
-            String userEmail = (String) request.getSession().getAttribute("email");
-            User user = userService.findUser(userEmail);
-
-            userService.removeUserResult(user.getId(), Integer.parseInt(userid));
-
-            //if user delete his marks - all his admissions will be deleted
-            userService.removeUserAdmissions(user.getId());
-            request.getSession().removeAttribute("admissions map");
-            modelAndView.setViewName("redirect:/app/marks");
-            return modelAndView;
-
-        }
+        userService.deleteUserMark(request);
+        request.getSession().removeAttribute("admissions map");
+        modelAndView.setViewName("redirect:/app/marks");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/app/admissions")
     public ModelAndView showListOfAdmissions(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView();
-
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
-
-
         User user = userService.findUser((String) request.getSession().getAttribute("email"));
-
         //getting all user admissions
         Map<String, Date> mapOfAdmissions = userService.findUserAdmissions(user, locale);
 
         HttpSession session = request.getSession();
-
         session.setAttribute("admissions map", mapOfAdmissions);
-
         modelAndView.setViewName("app/admissions");
         return modelAndView;
     }
@@ -215,28 +146,16 @@ public class UserActionsController {
     @RequestMapping(value = "/app/admission_del")
     public ModelAndView deleteAdmission(HttpServletRequest request) throws WrongFacultyException {
         ModelAndView modelAndView = new ModelAndView();
-        String faculty_Name = request.getParameter("faculty_name");
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
-        ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
-        //check if faculty name is empty
-        if (!faculty_Name.isEmpty()) {
-            User user = userService.findUser((String) request.getSession().getAttribute("email"));
-            //deleting admission
-            userService.deleteUserAdmission(user.getId(), faculty_Name, locale);
+        Map<String, Date> mapOfAdmissions = userService.deleteUserAdmission(request, locale);
+        request.getSession().removeAttribute("admissions map");
 
-            //update all user admissions, user admissions contains in session
-            Map<String, Date> mapOfAdmissions = userService.findUserAdmissions(user, locale);
-            request.getSession().removeAttribute("admissions map");
-
-            request.getSession().setAttribute("admissions map", mapOfAdmissions);
-            modelAndView.setViewName("redirect:/app/admissions");
-            return modelAndView;
-        } else {
-            throw new WrongFacultyException();
-        }
+        request.getSession().setAttribute("admissions map", mapOfAdmissions);
+        modelAndView.setViewName("redirect:/app/admissions");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/app/faculty")
@@ -245,74 +164,43 @@ public class UserActionsController {
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
-        ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
-        String id = request.getParameter("id");
-        if (id.isEmpty() || id.equals("")) {
-            throw new WrongIdOfFacultyException();
+
+        Faculty faculty = facultyService.findFacultyByIdAndLocale(request, locale);
+
+        Set<Integer> facultyDemends = facultyService.getFacultyDemends(String.valueOf(faculty.getId()));
+
+        Set<Integer> userSubjects = userService.getUserSubjects((String) request.getSession().getAttribute("email"));
+        faculty = facultyService.findFacultyById(String.valueOf(faculty.getId()), locale);
+
+        request.setAttribute("faculty", faculty);
+        if (userSubjects.containsAll(facultyDemends)) {
+            request.setAttribute("able to apply", true);
+            modelAndView.setViewName("app/faculty");
+            return modelAndView;
         } else {
-            Faculty faculty = facultyService.findFacultyById(id, locale);
-            if (faculty == null) {
-                throw new NoSuchFacultyException();
-            } else {
-                Set<Integer> facultyDemends = facultyService.getFacultyDemends(id);
-
-                Set<Integer> userSubjects = userService.getUserSubjects((String) request.getSession().getAttribute("email"));
-                faculty = facultyService.findFacultyById(id, locale);
-
-                request.setAttribute("faculty", faculty);
-                //user can pass more than 3 exams, check if user exams is good for faculty demends
-                if (userSubjects.containsAll(facultyDemends)) {
-                    request.setAttribute("able to apply", true);
-                    modelAndView.setViewName("app/faculty");
-                    return modelAndView;
-                } else {
-                    request.setAttribute("able to apply", false);
-                    modelAndView.setViewName("app/faculty");
-                    return modelAndView;
-                }
-
-            }
+            request.setAttribute("able to apply", false);
+            modelAndView.setViewName("app/faculty");
+            return modelAndView;
         }
+
     }
 
     @RequestMapping(value = "/app/participate")
     public ModelAndView sendAdmission(HttpServletRequest request) throws EmptyFacultyIdException, FacultyHaveNoDemendsException, AlreadySendedAmdissionException {
         ModelAndView modelAndView = new ModelAndView();
-        String faculty_id = request.getParameter("faculty_id");
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
         Locale current = new Locale(locale);
         ResourceBundle rb = ResourceBundle.getBundle("resource", current);
 
-        //checking if values are empty
-        if (faculty_id.equals("") || faculty_id.isEmpty()) {
-            throw new EmptyFacultyIdException();
-        } else {
+        Map<String, Date> mapOfAdmissions = userService.participateUser(request, locale);
+        //update map of admissions in session
+        request.getSession().removeAttribute("admissions map");
+        request.getSession().setAttribute("admissions map", mapOfAdmissions);
+        modelAndView.setViewName("redirect:/app/admissions");
+        return modelAndView;
 
-            User user = userService.findUser((String) request.getSession().getAttribute("email"));
-
-            List<Admission> listAdmission = userService.getUserAdmissionForFaculty(user.getId(), Integer.parseInt(faculty_id));
-            Set<Integer> list = facultyService.getFacultyDemends(faculty_id);
-
-
-            //If faculty have no demends, user can`t apply
-            if (list.size() < 3) {
-                throw new FacultyHaveNoDemendsException();
-            } else if (listAdmission.isEmpty()) {
-
-                userService.addUserAdmissionToFaculty(user.getId(), Integer.parseInt(faculty_id));
-                Map<String, Date> mapOfAdmissions = userService.findUserAdmissions(user, locale);
-                //update map of admissions in session
-                request.getSession().removeAttribute("admissions map");
-                request.getSession().setAttribute("admissions map", mapOfAdmissions);
-                modelAndView.setViewName("redirect:/app/admissions");
-                return modelAndView;
-
-            } else {//if user already send admission
-                throw new AlreadySendedAmdissionException();
-            }
-        }
     }
 
     @RequestMapping(value = "/app/personalInfo")
@@ -348,72 +236,12 @@ public class UserActionsController {
     public ModelAndView changePersonalInfo(HttpServletRequest request) throws EmptyParametersException, SuchEmailExistException, SuchIdnExistException {
         ModelAndView modelAndView = new ModelAndView();
 
-
-        //getting parameters
-        String email = request.getParameter("email");
-        String pass1 = request.getParameter("pass1");
-        String idn = request.getParameter("idn");
-        String name = request.getParameter("name");
-        String surname = request.getParameter("surname");
-        String patronymic = request.getParameter("patronymic");
-        String city = request.getParameter("city");
-        String region = request.getParameter("region");
-        String school_name = request.getParameter("school_name");
-        String average_certificate_point = request.getParameter("average_certificate_point");
-        String name_ua = request.getParameter("name_ua");
-        String surname_ua = request.getParameter("surname_ua");
-        String patronymic_ua = request.getParameter("patronymic_ua");
-        String city_ua = request.getParameter("city_ua");
-        String region_ua = request.getParameter("region_ua");
-        String school_name_ua = request.getParameter("school_name_ua");
-
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
-        //getting locale for errors
-        ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
-
-        if (email.isEmpty() || pass1.isEmpty() || idn.isEmpty() ||
-                name.isEmpty() || surname.isEmpty() || patronymic.isEmpty() || city.isEmpty() ||
-                region.isEmpty() || school_name.isEmpty() || average_certificate_point.isEmpty() || name_ua.isEmpty() ||
-                surname_ua.isEmpty() || patronymic_ua.isEmpty() || city_ua.isEmpty() || region_ua.isEmpty() ||
-                school_name_ua.isEmpty()) {
-
-            throw new EmptyParametersException();
-        } else {
-            //find user by email, show us if such email exists
-            User user = userService.findUser(email);
-
-            //get user from session
-            User sessionUser = userService.findUser((String) request.getSession().getAttribute("email"));
-
-            //if email exists
-            if (user != null && !user.getEmail().equals(sessionUser.getEmail())) {
-                throw new SuchEmailExistException();
-            }
-            user = userService.findUserByIdn(idn);
-
-            //if identification number exists
-            if (user != null && user.getIdn() != sessionUser.getIdn()) {
-                throw new SuchIdnExistException();
-            } else {
-
-
-                //if user changed email, then change email in session
-                request.getSession().removeAttribute("email");
-                request.getSession().setAttribute("email", email);
-
-
-                //updating user and user details
-                userService.updateUser(email, Long.parseLong(idn), pass1, sessionUser.getId());
-                userService.updateDetails(name, surname, patronymic, city, region, school_name, Integer.parseInt(average_certificate_point), name_ua, surname_ua, patronymic_ua, city_ua, region_ua, school_name_ua, sessionUser.getId());
-                //if user changed his details - all user admission will delete
-                userService.removeUserAdmissions(sessionUser.getId());
-                modelAndView.setViewName("redirect:/app/personalInfo");
-                return modelAndView;
-            }
-
-        }
+        userService.changeUserInfo(request, locale);
+        modelAndView.setViewName("redirect:/app/personalInfo");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/app/statements")

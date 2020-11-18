@@ -1,4 +1,4 @@
 package exception;
 
-public class UserBlockedException extends Exception{
+public class UserBlockedException extends RuntimeException{
 }

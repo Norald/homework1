@@ -1,4 +1,4 @@
 package exception;
 
-public class SuchIdnExistException extends Exception {
+public class SuchIdnExistException extends RuntimeException {
 }

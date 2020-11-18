@@ -1,4 +1,4 @@
 package exception;
 
-public class AlreadySendedAmdissionException extends Exception {
+public class AlreadySendedAmdissionException extends RuntimeException {
 }

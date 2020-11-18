@@ -1,4 +1,4 @@
 package exception;
 
-public class PasswordDontMatchException extends Exception {
+public class PasswordDontMatchException extends RuntimeException {
 }

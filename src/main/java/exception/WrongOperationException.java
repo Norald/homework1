@@ -1,4 +1,4 @@
 package exception;
 
-public class WrongOperationException extends Exception {
+public class WrongOperationException extends RuntimeException {
 }

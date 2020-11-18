@@ -20,16 +20,14 @@ import java.util.*;
 public class UserDao {
     private static final Logger LOG = LogManager.getLogger(UserDao.class.getName());
 
+    @Autowired
     private DBManager dbManager;
 
-    @Autowired
-    public UserDao(DBManager dbManager) {
-        this.dbManager = dbManager;
-    }
+//    @Autowired
+//    public UserDao(DBManager dbManager) {
+//        this.dbManager = dbManager;
+//    }
 
-    public UserDao() {
-
-    }
 
     /**
      * Adding user
@@ -387,12 +385,16 @@ public class UserDao {
         Connection con = null;
         try {
             con = dbManager.getConnection();
-            UserResultMapper mapper = new UserResultMapper();
+//            UserResultMapper mapper = new UserResultMapper();
             pstmt = con.prepareStatement(DaoUserRequest.GET_ALL_USER_MARKS_BY_EMAIL);
             pstmt.setString(1, email);
             rs = pstmt.executeQuery();
             while (rs.next()) {
-                result = mapper.mapRow(rs, locale);
+                result = new UserResult();
+                result.setUserId(rs.getInt(DBFields.USER__ID));
+                result.setSubjectExam(findSubjectExam(rs.getInt(DBFields.SUBJECT__EXAM_ID), locale));
+                result.setResult(rs.getInt(DBFields.RESULT));
+                result.setDateOfExam(rs.getDate(DBFields.DATE_OF_EXAM));
                 resultList.add(result);
             }
             rs.close();
@@ -401,7 +403,7 @@ public class UserDao {
 //            DBManager.getInstance().rollbackAndClose(con);
             LOG.error(ex.getMessage(), ex);
         } finally {
-            dbManager.commitAndClose(con);
+            //dbManager.commitAndClose(con);
         }
         return resultList;
     }
@@ -1088,6 +1090,12 @@ public class UserDao {
      * Static class for mapping UserResult
      */
     public static class UserResultMapper {
+        private UserDao userDao;
+
+        @Autowired
+        public UserResultMapper(UserDao userDao) {
+            this.userDao = userDao;
+        }
 
         public UserResultMapper() {
         }
@@ -1096,7 +1104,6 @@ public class UserDao {
             try {
                 UserResult result = new UserResult();
                 result.setUserId(rs.getInt(DBFields.USER__ID));
-                UserDao userDao = new UserDao();
                 result.setSubjectExam(userDao.findSubjectExam(rs.getInt(DBFields.SUBJECT__EXAM_ID), locale));
                 result.setResult(rs.getInt(DBFields.RESULT));
                 result.setDateOfExam(rs.getDate(DBFields.DATE_OF_EXAM));

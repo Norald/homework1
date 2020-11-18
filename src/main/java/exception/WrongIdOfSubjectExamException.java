@@ -1,4 +1,4 @@
 package exception;
 
-public class WrongIdOfSubjectExamException extends Exception{
+public class WrongIdOfSubjectExamException extends RuntimeException{
 }

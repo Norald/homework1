@@ -1,4 +1,4 @@
 package exception;
 
-public class CantGetFacultiesException extends Exception {
+public class CantGetFacultiesException extends RuntimeException {
 }

@@ -31,7 +31,7 @@ public class UserDetails {
     private String documentUrl;
 
 
-    private int average_certificate;
+    private int averageCertificate;
 
     public int getUserId() {
         return userId;
@@ -97,12 +97,12 @@ public class UserDetails {
         this.documentUrl = documentUrl;
     }
 
-    public int getAverage_certificate() {
-        return average_certificate;
+    public int getAverageCertificate() {
+        return averageCertificate;
     }
 
     public void setAverage_certificate(int average_certificate) {
-        this.average_certificate = average_certificate;
+        this.averageCertificate = average_certificate;
     }
 
     @Override
@@ -116,7 +116,7 @@ public class UserDetails {
                 ", region='" + region + '\'' +
                 ", school_name='" + schoolName + '\'' +
                 ", document_url='" + documentUrl + '\'' +
-                ", average_certificate=" + average_certificate +
+                ", averageCertificate=" + averageCertificate +
                 '}';
     }
 }

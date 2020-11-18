@@ -1,4 +1,4 @@
 package exception;
 
-public class CantGetUsersException extends Exception{
+public class CantGetUsersException extends RuntimeException{
 }

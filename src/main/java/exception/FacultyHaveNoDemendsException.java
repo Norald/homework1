@@ -1,4 +1,4 @@
 package exception;
 
-public class FacultyHaveNoDemendsException extends Exception {
+public class FacultyHaveNoDemendsException extends RuntimeException {
 }
