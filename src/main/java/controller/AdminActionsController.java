@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import path.PathApp;
 import pdf.CreateStatement;
@@ -87,22 +88,24 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/add_faculty")
-    public ModelAndView addFaculty(HttpServletRequest request) throws EmptyParametersException {
+    public ModelAndView addFaculty(@RequestParam(name = "name") String name,
+                                   @RequestParam(name = "name_ua") String name_ua,
+                                   @RequestParam(name = "description") String description,
+                                   @RequestParam(name = "description_ua") String description_ua,
+                                   @RequestParam(name = "budget_amount") String budget_amount,
+                                   @RequestParam(name = "total_amount") String total_amount,
+                                   HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
-        //getting locale
-        String locale = (String) request.getSession().getAttribute("language");
-        //getting locale for errors
-        ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
-        //add new faculty
-        facultyService.addFaculty(request);
+        facultyService.addFaculty(name, name_ua, description, description_ua, budget_amount, total_amount);
         modelAndView.setViewName("redirect:/app/admin/all_faculties");
         return modelAndView;
     }
 
     @RequestMapping(value = "/app/admin/delete_faculty")
-    public ModelAndView deleteFaculty(HttpServletRequest request) throws EmptyFacultyIdException {
+    public ModelAndView deleteFaculty(@RequestParam(name = "id") String id,
+                                      HttpServletRequest request) throws EmptyFacultyIdException {
         ModelAndView modelAndView = new ModelAndView();
-        facultyService.deleteFaculty(request);
+        facultyService.deleteFaculty(id);
         modelAndView.setViewName("redirect:/app/admin/all_faculties");
         return modelAndView;
     }
@@ -148,17 +151,22 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/add_subject_exam")
-    public ModelAndView addSubject(HttpServletRequest request) throws EmptyParametersException {
+    public ModelAndView addSubject(@RequestParam(name = "name") String name,
+                                   @RequestParam(name = "name_ua") String name_ua,
+                                   @RequestParam(name = "description") String description,
+                                   @RequestParam(name = "description_ua") String description_ua,
+                                   HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
-        facultyService.addSubjectExam(request);
+        facultyService.addSubjectExamImp(name, name_ua, description, description_ua);
         modelAndView.setViewName("redirect:/app/admin/subject_exams");
         return modelAndView;
     }
 
     @RequestMapping(value = "/app/admin/delete_subject_exam")
-    public ModelAndView deleteSubject(HttpServletRequest request) throws EmptyParametersException {
+    public ModelAndView deleteSubject(@RequestParam(name = "id") String id,
+                                      HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
-        facultyService.deleteSubjectExam(request);
+        facultyService.deleteSubjectExam(id);
         modelAndView.setViewName("redirect:/app/admin/subject_exams");
         return modelAndView;
     }
@@ -203,18 +211,22 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/block_user")
-    public ModelAndView blockUser(HttpServletRequest request) throws EmptyParametersException, WrongOperationException {
+    public ModelAndView blockUser(@RequestParam(name = "operation") String operation,
+                                  @RequestParam(name = "id") String id,
+                                  HttpServletRequest request) throws EmptyParametersException, WrongOperationException {
         ModelAndView modelAndView = new ModelAndView();
-        userService.blockUnblockUser(request);
+        userService.blockUnblockUser(operation, id);
         modelAndView.setViewName("redirect:/app/admin/users");
         return modelAndView;
 
     }
 
     @RequestMapping(value = "/app/admin/user_set_role")
-    public ModelAndView changeUserRole(HttpServletRequest request) throws EmptyParametersException, WrongOperationException {
+    public ModelAndView changeUserRole(@RequestParam(name = "operation") String operation,
+                                       @RequestParam(name = "id") String id,
+                                       HttpServletRequest request) throws EmptyParametersException, WrongOperationException {
         ModelAndView modelAndView = new ModelAndView();
-        userService.setUnsetUserRole(request);
+        userService.setUnsetUserRole(operation, id);
         modelAndView.setViewName("redirect:/app/admin/users");
         return modelAndView;
     }
@@ -253,26 +265,37 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/faculty_demend")
-    public ModelAndView addFacultyDemend(HttpServletRequest request) throws EmptyParametersException {
+    public ModelAndView addFacultyDemend(@RequestParam(name = "demendSelect") String demendSelect,
+                                         @RequestParam(name = "idFaculty") String idFaculty,
+                                         HttpServletRequest request) throws EmptyParametersException {
 
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
 
-        facultyService.addFacultyDemend(request, locale);
+        facultyService.addFacultyDemend(demendSelect, idFaculty, locale);
+        request.getSession().setAttribute("id", idFaculty);
         modelAndView.setViewName("redirect:/app/admin/faculty_admissions");
         return modelAndView;
     }
 
     @RequestMapping(value = "/app/admin/delete_demend")
-    public ModelAndView deleteFacultyDemend(HttpServletRequest request) throws EmptyParametersException {
+    public ModelAndView deleteFacultyDemend(@RequestParam(name = "idExam") String idExam,
+                                            @RequestParam(name = "idFaculty") String idFaculty,
+                                            HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
-        facultyService.deleteFacultyDemend(request, locale);
+        Faculty faculty = facultyService.deleteFacultyDemend(idFaculty, idExam, locale);
+        List<SubjectExam> examFullList = facultyService.getAllSubjectExams(locale);
+        List<SubjectExam> examList = facultyService.getFacultyDemendsWithName(idFaculty, locale);
+        examFullList.removeAll(examList);
+        request.setAttribute("faculty", faculty);
+        request.setAttribute("examAvailableList", examFullList);
+        request.setAttribute("examList", examList);
         modelAndView.setViewName("app/admin/faculty_demends");
         return modelAndView;
     }
@@ -317,15 +340,23 @@ public class AdminActionsController {
     }
 
     @RequestMapping(value = "/app/admin/generate_statement")
-    public ModelAndView generatePageStatement(HttpServletRequest request) throws EmptyParametersException {
+    public ModelAndView generatePageStatement(@RequestParam(name = "id") String id,
+                                              @RequestParam(name = "date") String date,
+                                              HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
+
 
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
+        Faculty faculty = facultyService.findFacultyById(id, locale);
 
-        facultyService.generateFacultiesListForStatement(request, locale);
+        ArrayList<UserFinalStatementResult> list = facultyService.generateFacultiesListForStatement(id, locale, date);
+        request.getSession().setAttribute("date", date);
+        request.getSession().setAttribute("facultyStatement", faculty);
+        request.getSession().setAttribute("results", list);
+
         modelAndView.setViewName("app/admin/statement");
         return modelAndView;
     }
@@ -347,7 +378,9 @@ public class AdminActionsController {
         ModelAndView modelAndView = new ModelAndView();
 
         String locale = (String) request.getSession().getAttribute("language");
-        facultyService.generateEarlyStatement(request, locale, statement);
+        Faculty faculty = (Faculty) request.getSession().getAttribute("facultyStatement");
+        ArrayList<UserFinalStatementResult> results = (ArrayList<UserFinalStatementResult>) request.getSession().getAttribute("results");
+        facultyService.generateEarlyStatement(faculty, results, statement, locale);
 
         modelAndView.setViewName("app/admin/admin_home");
         return modelAndView;
@@ -357,24 +390,36 @@ public class AdminActionsController {
     public ModelAndView generateLateStatement(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView();
         String locale = (String) request.getSession().getAttribute("language");
-        facultyService.generateLateStatement(request, locale, statement);
+        Faculty faculty = (Faculty) request.getSession().getAttribute("facultyStatement");
+        String date = (String) request.getSession().getAttribute("date");
+
+        facultyService.generateLateStatement(faculty, date, locale, statement);
         modelAndView.setViewName("app/admin/admin_home");
         return modelAndView;
     }
 
     @RequestMapping(value = "/app/admin/confirm_user_for_statement")
-    public ModelAndView confirmUserForStatement(HttpServletRequest request) throws EmptyParametersException {
+    public ModelAndView confirmUserForStatement(@RequestParam(name = "idAdmission") String idAdmission,
+                                                @RequestParam(name = "operation") String operation,
+                                                HttpServletRequest request) throws EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
+        String date = (String) request.getSession().getAttribute("date");
+
+        Faculty faculty = (Faculty) request.getSession().getAttribute("facultyStatement");
         //getting locale for errors
-        facultyService.confirmUserForStatement(request, locale);
+        ArrayList<UserFinalStatementResult> list = facultyService.confirmUserForStatement(idAdmission,operation , locale, date, faculty);
+        request.getSession().setAttribute("date", date);
+        request.getSession().setAttribute("results", list);
+        request.getSession().setAttribute("facultyStatement", faculty);
         modelAndView.setViewName("app/admin/statement");
         return modelAndView;
     }
 
     @RequestMapping(value = "/app/admin/delete_statement")
-    public ModelAndView deleteStatement(HttpServletRequest request) throws IOException, EmptyParametersException {
+    public ModelAndView deleteStatement(@RequestParam(name = "name") String name,
+                                        HttpServletRequest request) throws IOException, EmptyParametersException {
         ModelAndView modelAndView = new ModelAndView();
 
         //getting locale
@@ -382,7 +427,7 @@ public class AdminActionsController {
         String locale = (String) request.getSession().getAttribute("language");
         ResourceBundle rb = ResourceBundle.getBundle("resource", new Locale(locale));
 
-        facultyService.deleteStatement(request, worker);
+        facultyService.deleteStatement(name, worker);
         modelAndView.setViewName("app/all_statements");
         return modelAndView;
 

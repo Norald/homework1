@@ -16,6 +16,7 @@ import path.PathApp;
 import pdf.CreateStatement;
 import pdf.StatementWorker;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -151,7 +152,7 @@ public class FacultyService {
         }
     }
 
-    public List<SubjectExam> getUserAvailableSubjects(HttpServletRequest request, String locale, List<UserResult> results){
+    public List<SubjectExam> getUserAvailableSubjects(String locale, List<UserResult> results){
          //getting all exams
         List<SubjectExam> exams = facultyDao.getAllSubjectExams(locale);
 
@@ -164,57 +165,40 @@ public class FacultyService {
         return exams;
     }
 
-    public Faculty findFacultyByIdAndLocale(HttpServletRequest request, String locale){
+    public Faculty findFacultyByIdAndLocale(String id, String locale){
         Faculty faculty = null;
-        try{
-            String id = request.getParameter("id");
-            if (id.isEmpty() || id.equals("")) {
-                throw new WrongIdOfFacultyException();
-            } else{
-                faculty = findFacultyById(id, locale);
-                if (faculty == null) {
-                    throw new NoSuchFacultyException();
-                }
-                return faculty;
+        if (id.isEmpty() || id.equals("")) {
+            throw new WrongIdOfFacultyException();
+        } else {
+            faculty = findFacultyById(id, locale);
+            if (faculty == null) {
+                throw new NoSuchFacultyException();
             }
-        }catch (Exception e){
-            throw new EmptyParametersException();
+            return faculty;
         }
+
     }
 
-    public void addFaculty(HttpServletRequest request){
-        try{
-            String name = request.getParameter("name");
-            String name_ua = request.getParameter("name_ua");
-            String description = request.getParameter("description");
-            String description_ua = request.getParameter("description_ua");
-            String budget_amount = request.getParameter("budget_amount");
-            String total_amount = request.getParameter("total_amount");
-            if (request.getParameter("name") == null || request.getParameter("name_ua") == null ||
-                    request.getParameter("description") == null || request.getParameter("description_ua") == null ||
-                    request.getParameter("budget_amount") == null || request.getParameter("total_amount") == null) {
-                throw new EmptyParametersException();
-            } else {
-                addFaculty(name, Integer.parseInt(budget_amount), Integer.parseInt(total_amount), description, name_ua, description_ua);
-            }
-        }catch (Exception e){
+    public void addFaculty(String name, String name_ua, String description, String description_ua, String budget_amount, String total_amount){
+        if (name == null || name_ua == null ||
+                description == null || description_ua == null ||
+                budget_amount == null || total_amount == null) {
             throw new EmptyParametersException();
+        } else {
+            addFaculty(name, Integer.parseInt(budget_amount), Integer.parseInt(total_amount), description, name_ua, description_ua);
         }
+
     }
 
-    public void deleteFaculty(HttpServletRequest request){
-        try{
-            String id = request.getParameter("id");
-            if (request.getParameter("id") == null) {
-                throw new EmptyFacultyIdException();
-            } else {
-                //DELETE ALL ADMISSIONS AND DEMENDS IF FACULTY DELETED!
-                deleteFacultyById(Integer.parseInt(id));
-                deleteExamDemndsFacultyById(Integer.parseInt(id));
-                deleteAllFacultyAdmissions(Integer.parseInt(id));
-            }
-        }catch (Exception e){
-            throw new EmptyParametersException();
+    public void deleteFaculty(String id) {
+
+        if (id == null) {
+            throw new EmptyFacultyIdException();
+        } else {
+            //DELETE ALL ADMISSIONS AND DEMENDS IF FACULTY DELETED!
+            deleteFacultyById(Integer.parseInt(id));
+            deleteExamDemndsFacultyById(Integer.parseInt(id));
+            deleteAllFacultyAdmissions(Integer.parseInt(id));
         }
     }
 
@@ -229,14 +213,11 @@ public class FacultyService {
         }
     }
 
-    public void addSubjectExam(HttpServletRequest request){
+    public void addSubjectExamImp(String name, String name_ua, String description, String description_ua){
         try{
-            String name = request.getParameter("name");
-            String name_ua = request.getParameter("name_ua");
-            String description = request.getParameter("description");
-            String description_ua = request.getParameter("description_ua");
-            if (request.getParameter("name") == null || request.getParameter("name_ua") == null ||
-                    request.getParameter("description") == null || request.getParameter("description_ua") == null) {
+
+            if (name == null || name_ua == null ||
+                    description == null || description_ua == null) {
                 throw new EmptyParametersException();
             } else {
                 //add exam
@@ -247,52 +228,38 @@ public class FacultyService {
         }
     }
 
-    public void deleteSubjectExam(HttpServletRequest request){
-        try{
-            String id = request.getParameter("id");
-            if (request.getParameter("id") == null) {
-                throw new EmptyParametersException();
-            } else {
-                //DELETE admissions if subject exam deleted
-                deleteSubjectExamById(Integer.parseInt(id));
-                userDao.deleteAllResultsBySubjectExamId(Integer.parseInt(id));
-                Set<Integer> facultiesId = getFacultyDemends(id);
-                for (Integer i : facultiesId) {
-                    deleteAllFacultyAdmissions(i);
-                }
-            }
-        }catch (Exception e){
+    public void deleteSubjectExam(String id) {
+        if (id == null) {
             throw new EmptyParametersException();
+        } else {
+            //DELETE admissions if subject exam deleted
+            deleteSubjectExamById(Integer.parseInt(id));
+            userDao.deleteAllResultsBySubjectExamId(Integer.parseInt(id));
+            Set<Integer> facultiesId = getFacultyDemends(id);
+            for (Integer i : facultiesId) {
+                deleteAllFacultyAdmissions(i);
+            }
         }
     }
 
-    public void addFacultyDemend(HttpServletRequest request, String locale){
-        try{
-            String examId = request.getParameter("demendSelect");
-            String facultyId = request.getParameter("idFaculty");
-            if (request.getParameter("idFaculty") == null && request.getParameter("idFaculty") == null) {
+    public void addFacultyDemend(String demendSelect, String facultyId, String locale){
+            if (facultyId == null || demendSelect == null) {
                 throw new EmptyParametersException();
             } else {
                 //add exam demend for faculty
-                addExamDemendForFaculty(Integer.parseInt(examId), Integer.parseInt(facultyId));
+                addExamDemendForFaculty(Integer.parseInt(demendSelect), Integer.parseInt(facultyId));
                 //if demends changed - all admissions should be deleted
                 deleteAllFacultyAdmissions(Integer.parseInt(facultyId));
                 Faculty faculty = findFacultyById(facultyId, locale);
                 List<SubjectExam> examList = getFacultyDemendsWithName(facultyId, locale);
                 List<SubjectExam> examFullList = getAllSubjectExams(locale);
                 examFullList.removeAll(examList);
-                request.getSession().setAttribute("id", facultyId);
             }
-        }catch (Exception e){
-            throw new EmptyParametersException();
-        }
     }
 
-    public void deleteFacultyDemend(HttpServletRequest request, String locale){
-        try{
-            String idFaculty = request.getParameter("idFaculty");
-            String idExam = request.getParameter("idExam");
-            if (request.getParameter("idFaculty") == null || request.getParameter("idExam") == null) {
+    public Faculty deleteFacultyDemend(String idFaculty, String idExam, String locale){
+
+            if (idFaculty == null || idExam == null) {
                 throw new EmptyParametersException();
             } else {
 
@@ -302,23 +269,13 @@ public class FacultyService {
                 deleteExamDemendForFaculty(Integer.parseInt(idExam), Integer.parseInt(idFaculty));
                 deleteAllFacultyAdmissions(Integer.parseInt(idFaculty));
                 //remove values from dropdown list
-                List<SubjectExam> examFullList = getAllSubjectExams(locale);
-                List<SubjectExam> examList = getFacultyDemendsWithName(idFaculty, locale);
-                examFullList.removeAll(examList);
-                request.setAttribute("faculty", faculty);
-                request.setAttribute("examAvailableList", examFullList);
-                request.setAttribute("examList", examList);
+                return faculty;
+
             }
-        }catch (Exception e){
-            throw new EmptyParametersException();
-        }
     }
 
-    public void generateFacultiesListForStatement(HttpServletRequest request, String locale){
-        try{
-            String idFaculty = request.getParameter("id");
-            String date = request.getParameter("date");
-            if (request.getParameter("id") == null || request.getParameter("date") == null) {
+    public ArrayList<UserFinalStatementResult> generateFacultiesListForStatement(String idFaculty, String locale, String date){
+       if (idFaculty == null) {
                 throw new EmptyParametersException();
             } else {
                 //find faculty
@@ -332,22 +289,13 @@ public class FacultyService {
                 }
                 //sort list by total result
                 Collections.sort(results, new TotalResultComparator());
-                //set values to session
-                request.getSession().setAttribute("date", date);
-                request.getSession().setAttribute("results", results);
-                request.getSession().setAttribute("facultyStatement", faculty);
+                return results;
             }
-        }catch (Exception e){
-            throw new EmptyParametersException();
-        }
     }
 
-    public void generateEarlyStatement(HttpServletRequest request, String locale, CreateStatement statement){
+    public void generateEarlyStatement(Faculty faculty, ArrayList<UserFinalStatementResult> results, CreateStatement statement, String locale){
         try{
             //getting values from session
-            Faculty faculty = (Faculty) request.getSession().getAttribute("facultyStatement");
-            ArrayList<UserFinalStatementResult> results = (ArrayList<UserFinalStatementResult>) request.getSession().getAttribute("results");
-
             String name = faculty.getName();
             //change name, delete spaces
             name = name.replaceAll(" ", "_");
@@ -366,43 +314,32 @@ public class FacultyService {
         }
     }
 
-    public void generateLateStatement(HttpServletRequest request, String locale, CreateStatement statement){
-        try{
-            Faculty faculty = (Faculty) request.getSession().getAttribute("facultyStatement");
+    public void generateLateStatement(Faculty faculty, String date, String locale, CreateStatement statement){
 
-            String name = faculty.getName();
-            name = name.replaceAll(" ", "_");
-            String fileName = "Generate_Late_Report_" + name + "_" + new java.sql.Date(System.currentTimeMillis()) + "_" + System.currentTimeMillis() + ".pdf";
+        String name = faculty.getName();
+        name = name.replaceAll(" ", "_");
+        String fileName = "Generate_Late_Report_" + name + "_" + new java.sql.Date(System.currentTimeMillis()) + "_" + System.currentTimeMillis() + ".pdf";
 
 
-            String date = (String) request.getSession().getAttribute("date");
+        //find all applied admissions for faculty
+        List<Admission> admissionList = userDao.getAllAppliedUsersAdmissionsForFacultyWithDate(faculty.getId(), getDateFromString(date));
+        ArrayList<UserFinalStatementResult> results = new ArrayList<>();
+        //getting final results for applied user statements
+        for (int i = 0; i < admissionList.size(); i++) {
+            results.add(userDao.getFinalStatementResultForFaculty(admissionList.get(i).getUserId(), faculty.getId(), locale));
+        }
+        //sort list by total result
+        Collections.sort(results, new TotalResultComparator());
 
-            //find all applied admissions for faculty
-            List<Admission> admissionList = userDao.getAllAppliedUsersAdmissionsForFacultyWithDate(faculty.getId(), getDateFromString(date));
-            ArrayList<UserFinalStatementResult> results = new ArrayList<>();
-            //getting final results for applied user statements
-            for (int i = 0; i < admissionList.size(); i++) {
-                results.add(userDao.getFinalStatementResultForFaculty(admissionList.get(i).getUserId(), faculty.getId(), locale));
-            }
-            //sort list by total result
-            Collections.sort(results, new TotalResultComparator());
-
-
-            try {
-                statement.createPDF("C:/Users/Влад/Desktop/Selectioncommittee/out/statements/" + fileName, faculty, results, locale);
-            } catch (Exception e1) {
-                LOG.warn(e1.getMessage(), e1);
-            }
-        }catch (Exception e){
-            throw new EmptyParametersException();
+        try {
+            statement.createPDF("C:/Users/Влад/Desktop/Selectioncommittee/out/statements/" + fileName, faculty, results, locale);
+        } catch (Exception e1) {
+            LOG.warn(e1.getMessage(), e1);
         }
     }
 
-    public void confirmUserForStatement(HttpServletRequest request, String locale){
-        try{
-            String idAdmission = request.getParameter("idAdmission");
-            String operation = request.getParameter("operation");
-            if (request.getParameter("idAdmission") == null || request.getParameter("operation") == null) {
+    public ArrayList<UserFinalStatementResult> confirmUserForStatement(String idAdmission, String operation, String locale, String date, Faculty faculty){
+            if (idAdmission == null || operation == null) {
                 throw new EmptyParametersException();
             } else {
                 if (operation.equals("approve")) {
@@ -411,9 +348,7 @@ public class FacultyService {
                     disapproveAdmission(Integer.parseInt(idAdmission));
                 }
 
-                String date = (String) request.getSession().getAttribute("date");
 
-                Faculty faculty = (Faculty) request.getSession().getAttribute("facultyStatement");
                 //find faculty
                 //find all admissions for faculty
                 List<Admission> admissionList = userDao.getAllUsersAdmissionsForFacultyWithDate(faculty.getId(), getDateFromString(date));
@@ -425,28 +360,18 @@ public class FacultyService {
                 //sort list by total result
                 Collections.sort(results, new TotalResultComparator());
                 //set values to session
-                request.getSession().setAttribute("date", date);
-                request.getSession().setAttribute("results", results);
-                request.getSession().setAttribute("facultyStatement", faculty);
+                return results;
             }
-        }catch (Exception e){
-            throw new EmptyParametersException();
-        }
     }
 
-    public void deleteStatement(HttpServletRequest request, StatementWorker worker){
-        try{
-            //get name from request
-            String filename = request.getParameter("name");
-            if (request.getParameter("name") == null) {
+    public void deleteStatement(String name, StatementWorker worker) throws IOException {
+
+            if (name == null) {
                 throw new EmptyParametersException();
             } else {
                 //delete file
-                worker.deleteStatement(PathApp.STATEMENTS_FOLDER + "/" + filename);
+                worker.deleteStatement(PathApp.STATEMENTS_FOLDER + "/" + name);
             }
-        } catch (Exception e){
-            throw new EmptyParametersException();
-        }
     }
 
 }

@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import path.PathApp;
 import pdf.StatementWorker;
@@ -97,9 +98,12 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/add_mark")
-    public ModelAndView addMark(HttpServletRequest request) throws EmptyParametersException {
+    public ModelAndView addMark(@RequestParam(name = "mark") String mark,
+                                @RequestParam(name = "marksSelect") String marksSelect,
+                                HttpServletRequest request) throws EmptyParametersException {
+        String userEmail = (String) request.getSession().getAttribute("email");
         ModelAndView modelAndView = new ModelAndView();
-        userService.addUserMark(request);
+        userService.addUserMark(mark, marksSelect, userEmail);
         modelAndView.setViewName("redirect:/app/marks");
         return modelAndView;
     }
@@ -112,7 +116,7 @@ public class UserActionsController {
         LOG.info(request.getSession().getAttribute("email"));
         //getting user exams
         List<UserResult> results = userService.findUserResults((String) request.getSession().getAttribute("email"), locale);
-        List<SubjectExam> exams = facultyService.getUserAvailableSubjects(request, locale, results);
+        List<SubjectExam> exams = facultyService.getUserAvailableSubjects(locale, results);
         request.setAttribute("results", results);
         request.setAttribute("exams", exams);
         modelAndView.setViewName("app/marks");
@@ -120,9 +124,10 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/mark_del")
-    public ModelAndView deleteMark(HttpServletRequest request) throws WrongIdOfSubjectExamException {
+    public ModelAndView deleteMark(@RequestParam(name = "subjectid") String subjectid, HttpServletRequest request) throws WrongIdOfSubjectExamException {
         ModelAndView modelAndView = new ModelAndView();
-        userService.deleteUserMark(request);
+        String userEmail = (String) request.getSession().getAttribute("email");
+        userService.deleteUserMark(subjectid, userEmail);
         request.getSession().removeAttribute("admissions map");
         modelAndView.setViewName("redirect:/app/marks");
         return modelAndView;
@@ -144,13 +149,13 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/admission_del")
-    public ModelAndView deleteAdmission(HttpServletRequest request) throws WrongFacultyException {
+    public ModelAndView deleteAdmission(@RequestParam(name = "faculty_name") String faculty_name, HttpServletRequest request) throws WrongFacultyException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
 
-        Map<String, Date> mapOfAdmissions = userService.deleteUserAdmission(request, locale);
+        Map<String, Date> mapOfAdmissions = userService.deleteUserAdmission(faculty_name, (String) request.getSession().getAttribute("email") ,locale);
         request.getSession().removeAttribute("admissions map");
 
         request.getSession().setAttribute("admissions map", mapOfAdmissions);
@@ -159,14 +164,14 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/faculty")
-    public ModelAndView facultyAdmission(HttpServletRequest request) throws WrongIdOfFacultyException, NoSuchFacultyException {
+    public ModelAndView facultyAdmission(@RequestParam(name = "id") String id, HttpServletRequest request) throws WrongIdOfFacultyException, NoSuchFacultyException {
         ModelAndView modelAndView = new ModelAndView();
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
 
 
-        Faculty faculty = facultyService.findFacultyByIdAndLocale(request, locale);
+        Faculty faculty = facultyService.findFacultyByIdAndLocale(id, locale);
 
         Set<Integer> facultyDemends = facultyService.getFacultyDemends(String.valueOf(faculty.getId()));
 
@@ -187,14 +192,14 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/participate")
-    public ModelAndView sendAdmission(HttpServletRequest request) throws EmptyFacultyIdException, FacultyHaveNoDemendsException, AlreadySendedAmdissionException {
+    public ModelAndView sendAdmission(@RequestParam(name = "faculty_id") String faculty_id, HttpServletRequest request) throws EmptyFacultyIdException, FacultyHaveNoDemendsException, AlreadySendedAmdissionException {
         ModelAndView modelAndView = new ModelAndView();
         String locale = (String) request.getSession().getAttribute("language");
         //getting locale for errors
         Locale current = new Locale(locale);
         ResourceBundle rb = ResourceBundle.getBundle("resource", current);
 
-        Map<String, Date> mapOfAdmissions = userService.participateUser(request, locale);
+        Map<String, Date> mapOfAdmissions = userService.participateUser(faculty_id, (String) request.getSession().getAttribute("email"),locale);
         //update map of admissions in session
         request.getSession().removeAttribute("admissions map");
         request.getSession().setAttribute("admissions map", mapOfAdmissions);
@@ -233,13 +238,32 @@ public class UserActionsController {
     }
 
     @RequestMapping(value = "/app/changeinfo")
-    public ModelAndView changePersonalInfo(HttpServletRequest request) throws EmptyParametersException, SuchEmailExistException, SuchIdnExistException {
+    public ModelAndView changePersonalInfo(@RequestParam(name = "email") String email,
+                                           @RequestParam(name = "pass1") String pass1,
+                                           @RequestParam(name = "idn") String idn,
+                                           @RequestParam(name = "name") String english_name,
+                                           @RequestParam(name = "surname") String english_surname,
+                                           @RequestParam(name = "patronymic") String english_patronymic,
+                                           @RequestParam(name = "city") String english_city,
+                                           @RequestParam(name = "region") String english_region,
+                                           @RequestParam(name = "school_name") String english_school_name,
+                                           @RequestParam(name = "average_certificate_point") String average_certificate_point,
+                                           @RequestParam(name = "name_ua") String ukrainian_name,
+                                           @RequestParam(name = "surname_ua") String ukrainian_surname,
+                                           @RequestParam(name = "patronymic_ua") String ukrainian_patronymic,
+                                           @RequestParam(name = "city_ua") String ukrainian_city,
+                                           @RequestParam(name = "region_ua") String ukrainian_region,
+                                           @RequestParam(name = "school_name_ua") String ukrainian_school_name,
+                                           HttpServletRequest request) throws EmptyParametersException, SuchEmailExistException, SuchIdnExistException {
         ModelAndView modelAndView = new ModelAndView();
+        String sessionUserEmail = ((String) request.getSession().getAttribute("email"));
 
         //getting locale
         String locale = (String) request.getSession().getAttribute("language");
 
-        userService.changeUserInfo(request, locale);
+        String emailResult = userService.changeUserInfo(email, pass1, idn, english_name, english_surname, english_patronymic, english_city, english_region, english_school_name, average_certificate_point, ukrainian_name,ukrainian_surname,ukrainian_patronymic,ukrainian_city,ukrainian_region,ukrainian_school_name, locale, sessionUserEmail);
+        request.getSession().removeAttribute("email");
+        request.getSession().setAttribute("email", emailResult);
         modelAndView.setViewName("redirect:/app/personalInfo");
         return modelAndView;
     }
